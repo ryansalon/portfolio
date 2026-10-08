@@ -18,7 +18,7 @@ export default function Manifesto() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 2.6vh, 30px)' }}>
           {lines.map((line) => (
             <div key={line} style={{ overflow: 'hidden', padding: '4px 0' }} data-rv>
-              <h2 className="display manifesto-line" style={{ fontSize: 'clamp(24px, 5vw, 60px)', lineHeight: 1.1 }}>
+              <h2 className="display manifesto-line h-sec" style={{ lineHeight: 1.1 }}>
                 {line}
               </h2>
             </div>

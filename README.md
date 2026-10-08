@@ -1,10 +1,10 @@
 # Ryan Marc L. Salon — Portfolio
 
-Personal developer portfolio built with React, TypeScript, and GSAP. Designed as a dark, cinematic single-page experience with scroll-driven animations and a particle drift hero background.
+Personal developer portfolio built with React, TypeScript, and GSAP. A cinematic single-page experience with a centered landing hero, scroll-driven animations, matrix-style particle background, and a dark / light theme.
 
 ## Live Demo
 
-[portfolioryanmarcsalon.netlify.app](https://portfolioryanmarcsalon.netlify.app)
+**[ryanmarcsalon-portfolio.netlify.app](https://ryanmarcsalon-portfolio.netlify.app/)**
 
 ## Tech Stack
 
@@ -12,21 +12,23 @@ Personal developer portfolio built with React, TypeScript, and GSAP. Designed as
 - **TypeScript** — Type safety
 - **Vite** — Build tool and dev server
 - **Tailwind CSS** — Utility-first styling
-- **GSAP** — Scroll-triggered animations, parallax, and reveals
+- **GSAP** — Scroll-triggered animations and reveals
 - **Lenis** — Smooth scrolling
-- **ThreeUI (ConstellationField)** — Canvas particle drift hero background
 
 ## Features
 
-- Particle drift hero background (ASCII node network with mouse interaction)
+- Centered landing hero — portrait, name, role, location, CTAs, and theme toggle
+- Matrix-style canvas particle background (falling glyphs, beams, and node network)
+- Theme-aware portrait — dark mode: gray → color on hover; light mode: color → gray on hover
+- Dark / light theme toggle (persisted in localStorage, no flash on load)
+- Fixed navigation that stays hidden over the hero and appears on scroll
+- Dashboard grid — Experience & Education timelines, About, and categorized Tech Stack cards
 - Scroll-triggered reveal animations on every section
-- GSAP-powered marquee tech stack carousel
-- Project cards with hover scale and gradient effects
+- Project cards with hover effects
 - Preloader with animated progress bar
 - Film grain and vignette overlays
-- Custom cursor
+- Custom cursor and scroll progress rail
 - Responsive — phone, tablet, desktop
-- Dark-mode only design
 
 ## Getting Started
 
@@ -50,29 +52,39 @@ Output goes to `dist/`. Deploy the `dist/` folder to any static host (Netlify, V
 ```
 src/
   components/
-    Hero.tsx              # Hero section with particle background
-    ParticleBackground.tsx # Canvas particle drift animation
-    Nav.tsx               # Fixed navigation with mobile hamburger
-    Profile.tsx           # About / profile section
-    TechStack.tsx         # Tech stack section
-    TechMarquee.tsx       # Infinite scrolling icon marquee
-    Projects.tsx          # Project showcase cards
-    Manifesto.tsx         # Manifesto lines
-    Contact.tsx           # Contact section
-    Footer.tsx            # Footer
-    Preloader.tsx         # Loading screen
-    GrainOverlay.tsx      # Film grain effect
-    Vignette.tsx          # Vignette overlay
-    CustomCursor.tsx      # Custom cursor
-    ProgressRail.tsx      # Scroll progress indicator
+    Hero.tsx               # Landing hero — portrait, name, CTAs, theme toggle
+    ParticleBackground.tsx # Canvas matrix-style particle background
+    Nav.tsx                # Fixed nav (hidden over hero), theme toggle, mobile menu
+    Dashboard.tsx          # O2 Profile — experience, education, about, tech stack
+    Projects.tsx           # O3 Solutions — project showcase cards
+    Manifesto.tsx          # Manifesto lines
+    Contact.tsx            # O4 Connect — contact section
+    Footer.tsx             # Footer
+    Preloader.tsx          # Loading screen
+    ThemeIcon.tsx          # Sun / moon icon for theme toggles
+    GrainOverlay.tsx       # Film grain effect
+    Vignette.tsx           # Vignette overlay
+    CustomCursor.tsx       # Custom cursor
+    ProgressRail.tsx       # Scroll progress indicator
   hooks/
-    useScrollReveal.ts    # Reusable GSAP scroll animation hook
-  index.css               # Global styles and responsive breakpoints
-  App.tsx                 # App shell
-  main.tsx                # Entry point
+    useScrollReveal.ts     # Reusable GSAP scroll animation hook
+    useReducedMotion.ts    # prefers-reduced-motion hook
+  lib/
+    scroll.ts              # Lenis instance helpers
+  theme.tsx                # Dark/light theme provider (persists to localStorage)
+  index.css                # Global styles and responsive breakpoints
+  App.tsx                  # App shell
+  main.tsx                 # Entry point
 public/
-  assets/                 # Static images (project screenshots, icons)
+  assets/                  # pfp.jpg, resume.pdf (replace the placeholder)
+  favicon.jpg              # Site favicon
 ```
+
+## Customizing
+
+- **Profile dashboard** — edit the `experience`, `education`, `stack`, and `aboutParagraphs` arrays at the top of `src/components/Dashboard.tsx`.
+- **Resume** — replace `public/assets/resume.pdf` with your real resume (same filename).
+- **Portrait** — replace `public/assets/pfp.jpg` with a higher-resolution photo (same filename).
 
 ## License
 

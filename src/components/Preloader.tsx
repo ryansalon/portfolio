@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
+import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
 
 export default function Preloader() {
   const preRef = useRef<HTMLDivElement>(null)
   const fillRef = useRef<HTMLDivElement>(null)
   const pctRef = useRef<HTMLSpanElement>(null)
   const [progress, setProgress] = useState(0)
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
+    if (reducedMotion) {
+      document.body.classList.remove('is-locked')
+      return
+    }
+
     let progressVal = 0
     const interval = setInterval(() => {
       progressVal += Math.random() * 15 + 5
@@ -24,14 +31,14 @@ export default function Preloader() {
     document.body.classList.add('is-locked')
 
     return () => clearInterval(interval)
-  }, [])
+  }, [reducedMotion])
 
   useEffect(() => {
     if (fillRef.current) fillRef.current.style.right = `${100 - progress}%`
   }, [progress])
 
   return (
-    <div ref={preRef} id="pre">
+    <div ref={preRef} id="pre" hidden={reducedMotion} aria-hidden="true">
       <div className="pre-inner">
         <div className="pre-mark">
           <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">

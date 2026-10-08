@@ -1,52 +1,87 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
+import { useTheme } from '../theme'
 import ParticleBackground from './ParticleBackground'
+import ThemeIcon from './ThemeIcon'
+
+function LocationPin() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+    </svg>
+  )
+}
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
-  const heroTopRef = useRef<HTMLDivElement>(null)
+  const reducedMotion = usePrefersReducedMotion()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    const items = heroTopRef.current?.querySelectorAll('.hero-reveal')
+    const items = sectionRef.current?.querySelectorAll('.hero-reveal')
     if (!items?.length) return
+
+    if (reducedMotion) {
+      gsap.set(items, { opacity: 1, y: 0, filter: 'none' })
+      return
+    }
 
     items.forEach((el, i) => {
       gsap.fromTo(el,
-        { opacity: 0, y: 60, filter: 'blur(8px)' },
-        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.4, delay: 2.0 + i * 0.2, ease: 'power3.out' }
+        { opacity: 0, y: 50, filter: 'blur(8px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.3, delay: 1.9 + i * 0.11, ease: 'power3.out' }
       )
     })
-
-    const section = sectionRef.current
-    if (!section) return
-    const onScroll = () => {
-      const scrollY = window.scrollY
-      const vh = window.innerHeight
-      const progress = Math.min(scrollY / (vh * 0.5), 1)
-      const top = heroTopRef.current
-      if (top) {
-        top.style.opacity = `${1 - progress}`
-        top.style.transform = `translate3d(0, ${-progress * 60}px, 0) scale(${1 - progress * 0.05})`
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [reducedMotion])
 
   return (
-    <section ref={sectionRef} id="hero" className="hero" style={{ position: 'relative', overflow: 'hidden' }}>
+    <section ref={sectionRef} id="hero" className="hero landing">
       <ParticleBackground />
-      <div ref={heroTopRef} className="hero-top" style={{ position: 'relative', zIndex: 1 }}>
-        <div className="eyebrow hero-reveal">
-          <span className="dot" />
-          RYAN MARC L SALON
+
+      <header className="landing-head hero-reveal">
+        <span className="rule-grad" />
+        <span className="lbl">Ryan Marc L. Salon || Portfolio 2026</span>
+        <span className="rule-grad right" />
+      </header>
+
+      <div className="landing-grid">
+        <figure className="landing-pfp hero-reveal" data-cursor>
+          <img src="/assets/pfp.jpg" alt="Ryan Marc L. Salon" />
+        </figure>
+
+        <div className="landing-copy">
+          <h1 className="landing-name hero-reveal">Ryan Marc L. Salon</h1>
+
+          <p className="landing-role hero-reveal">
+            Aspiring Full Stack Developer
+          </p>
+
+          <p className="landing-loc hero-reveal">
+            <LocationPin />
+            <span>Poblacion, Mahinog, Camiguin, Philippines</span>
+          </p>
+
+          <div className="landing-actions hero-reveal">
+            <a href="/assets/resume.pdf" download className="btn-solid" data-cursor>
+              Get Resume
+            </a>
+            <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-ghost" data-cursor>
+              Email Me
+            </a>
+          </div>
+
+          <button
+            className={`theme-pill hero-reveal${theme === 'dark' ? ' is-dark' : ''}`}
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            data-cursor
+          >
+            <span className="knob">
+              <ThemeIcon theme={theme} />
+            </span>
+          </button>
         </div>
-        <h1 className="display h-hero hero-reveal" style={{ fontSize: 'clamp(72px, 14vw, 200px)', lineHeight: 0.85, letterSpacing: '-.04em' }}>
-          Build Without<br />Limits
-        </h1>
-        <p className="hero-sub hero-reveal" style={{ marginTop: '40px', fontSize: 'clamp(18px, 1.8vw, 26px)', lineHeight: 1.72, color: 'var(--bone-dim)', fontWeight: 300, maxWidth: '620px' }}>
-          BSIT Student specializing in architectural web systems and high-precision digital tools.
-        </p>
       </div>
     </section>
   )

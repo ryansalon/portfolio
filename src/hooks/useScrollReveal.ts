@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { usePrefersReducedMotion } from './useReducedMotion'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -22,6 +23,7 @@ export function useScrollReveal(
   opts: ScrollRevealOptions = {}
 ) {
   const ref = useRef<HTMLElement>(null)
+  const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
     const container = ref.current
@@ -42,6 +44,11 @@ export function useScrollReveal(
 
     const els = container.querySelectorAll(selector)
     if (!els.length) return
+
+    if (reducedMotion) {
+      gsap.set(els, { opacity: 1, y: 0, scale: 1, rotateX: 0, clearProps: 'transform' })
+      return
+    }
 
     const anims = gsap.fromTo(
       els,
@@ -68,7 +75,7 @@ export function useScrollReveal(
       anims.scrollTrigger?.kill()
       anims.kill()
     }
-  }, [selector, JSON.stringify(opts)])
+  }, [selector, JSON.stringify(opts), reducedMotion])
 
   return ref
 }

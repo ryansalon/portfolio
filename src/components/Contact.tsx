@@ -9,17 +9,17 @@ export default function Contact() {
         <div className="grid-contact">
           <div data-rv>
             <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '24px' }}>
-              <b style={{ color: 'var(--vermilion)' }}>O5</b> — Connect
+              <b style={{ color: 'var(--accent)' }}>O4</b> — Connect
             </p>
-            <h2 className="display" style={{ fontSize: 'clamp(36px, 10vw, 100px)', lineHeight: 0.9, letterSpacing: '-.03em', marginBottom: '36px' }}>
+            <h2 className="display h-xl" style={{ marginBottom: '36px' }}>
               LET'S<br />TALK
             </h2>
             <a
-              href="mailto:ryanmarcsalon@04gmail.com"
+              href="mailto:ryanmarcsalon04@gmail.com"
               className="arrowlink"
               data-cursor
             >
-              rymarcsalon@04gmail.com
+              ryanmarcsalon04@gmail.com
               <span className="ar">
                 <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 12L12 1M12 1H3.5M12 1V9.5" stroke="currentColor" strokeWidth="1.2" />
@@ -41,7 +41,7 @@ export default function Contact() {
               <span className="alt">Facebook</span>
             </a>
             <a
-              href="https://github.com/ryanmarcsalon"
+              href="https://github.com/ryansalon"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link"
