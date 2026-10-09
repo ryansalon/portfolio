@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { usePrefersReducedMotion } from './hooks/useReducedMotion'
-import { setLenis } from './lib/scroll'
+import { setLenis, startActiveSectionTracking } from './lib/scroll'
 import { ThemeProvider } from './theme'
 import Preloader from './components/Preloader'
 import GrainOverlay from './components/GrainOverlay'
@@ -30,6 +30,7 @@ function App() {
       history.scrollRestoration = 'manual'
     }
     window.scrollTo(0, 0)
+    startActiveSectionTracking(SECTION_IDS)
 
     if (reducedMotion) {
       setLenis(null)

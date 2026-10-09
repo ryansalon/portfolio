@@ -47,7 +47,7 @@ export default function Hero() {
 
       <div className="landing-grid">
         <figure className="landing-pfp hero-reveal" data-cursor>
-          <img src="/assets/pfp.jpg" alt="Ryan Marc L. Salon" />
+          <img src="/assets/pfp.jpg" alt="Ryan Marc L. Salon" fetchPriority="high" decoding="async" />
         </figure>
 
         <div className="landing-copy">
@@ -63,10 +63,7 @@ export default function Hero() {
           </p>
 
           <div className="landing-actions hero-reveal">
-            <a href="/assets/resume.pdf" download className="btn-solid" data-cursor>
-              Get Resume
-            </a>
-            <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-ghost" data-cursor>
+            <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-solid" data-cursor>
               Email Me
             </a>
           </div>

@@ -15,7 +15,7 @@ const projects: Project[] = [
     id: 'O1',
     title: 'Voting System',
     tags: ['PHP', 'MySQL'],
-    image: '/assets/voting-system.png',
+    image: '/assets/voting-system.webp',
     alt: 'Voting System',
     imageFirst: false,
     description:
@@ -25,7 +25,7 @@ const projects: Project[] = [
     id: 'O2',
     title: 'Pacudan Bakeshop',
     tags: ['E-Commerce'],
-    image: '/assets/pacudan bakeshop.png',
+    image: '/assets/pacudan-bakeshop.webp',
     alt: 'Pacudan Bakeshop',
     imageFirst: true,
     description:
@@ -35,7 +35,7 @@ const projects: Project[] = [
     id: 'O3',
     title: 'Camiguin Tourism',
     tags: ['Next.js', 'Leaflet'],
-    image: '/assets/camiguin tourism.png',
+    image: '/assets/camiguin-tourism.webp',
     alt: 'Camiguin Tourism',
     imageFirst: false,
     description:

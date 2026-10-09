@@ -79,10 +79,29 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .pre-inner { width: min(420px, 74vw); text-align: center; }
 .pre-mark { margin: 0 auto 26px; width: 44px; height: 44px; opacity: .9; }
-.pre-mark svg { width: 100%; height: 100%; display: block; }
+.pre-mark svg, .pre-mark img { width: 100%; height: 100%; display: block; border-radius: 8px; object-fit: cover; }
 .pre-label { font-size: 10px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--bone-dim); margin-bottom: 20px; }
-.pre-bar { position: relative; height: 1px; background: var(--line); overflow: hidden; }
-.pre-bar i { position: absolute; inset: 0 100% 0 0; background: var(--bone); transition: right .35s linear; }
+.pre-bar { position: relative; height: 2px; background: var(--line); overflow: hidden; border-radius: 2px; }
+.pre-bar > div {
+  position: absolute; inset: 0 100% 0 0; border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--bone));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: right .45s var(--ease-out);
+}
+.pre-bar > div::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.55) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: pre-shimmer 1.4s linear infinite;
+}
+@keyframes pre-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pre-bar > div { transition: none; }
+  .pre-bar > div::after { animation: none; }
+}
 .pre-meta { display: flex; justify-content: space-between; margin-top: 12px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
 .pre-meta b { font-weight: 500; color: var(--bone-dim); font-variant-numeric: tabular-nums; }
 

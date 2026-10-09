@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { scrollToSection } from '../lib/scroll'
+import { scrollToSection, subscribeActiveSection } from '../lib/scroll'
 import { useTheme } from '../theme'
 import ThemeIcon from './ThemeIcon'
 
@@ -16,47 +16,54 @@ const navItems = [
 
 export default function Nav({ sectionIds }: NavProps) {
   const navRef = useRef<HTMLElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
   const burgerRef = useRef<HTMLButtonElement>(null)
   const lastScroll = useRef(0)
+  const menuOpenRef = useRef(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    const onScroll = () => {
+    menuOpenRef.current = menuOpen
+  }, [menuOpen])
+
+  useEffect(() => {
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav-link'))
+    let raf = 0
+
+    const updateChrome = () => {
+      raf = 0
       const y = window.scrollY
       const nav = navRef.current
       if (!nav) return
 
       nav.classList.toggle('stuck', y > 40)
-      nav.classList.toggle('over-hero', !menuOpen && y < window.innerHeight * 0.6)
-      if (!menuOpen) {
+      nav.classList.toggle('over-hero', !menuOpenRef.current && y < window.innerHeight * 0.6)
+      if (!menuOpenRef.current) {
         nav.classList.toggle('hide', y > lastScroll.current + 4 && y > window.innerHeight * 0.8)
       }
       lastScroll.current = y
+    }
 
-      const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean)
-      const vh = window.innerHeight
-      let closest = 0
-      let minDist = Infinity
-      sections.forEach((section, i) => {
-        if (!section) return
-        const rect = section.getBoundingClientRect()
-        const center = rect.top + rect.height / 2
-        const dist = Math.abs(center - vh / 2)
-        if (dist < minDist) { minDist = dist; closest = i }
-      })
-
-      const activeId = sectionIds[closest]
-      document.querySelectorAll('.nav-link').forEach((link) => {
-        link.classList.toggle('on', link.getAttribute('href') === `#${activeId}`)
-      })
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(updateChrome)
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [sectionIds, menuOpen])
+    updateChrome()
+
+    const unsubscribe = subscribeActiveSection((index) => {
+      const activeId = sectionIds[index]
+      links.forEach((link) => {
+        link.classList.toggle('on', link.getAttribute('href') === `#${activeId}`)
+      })
+    })
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+      unsubscribe()
+    }
+  }, [sectionIds])
 
   const toggleMenu = () => {
     setMenuOpen((prev) => {
@@ -132,7 +139,7 @@ export default function Nav({ sectionIds }: NavProps) {
         </div>
       </nav>
 
-      <div ref={panelRef} className={`nav-panel${menuOpen ? ' open' : ''}`}>
+      <div className={`nav-panel${menuOpen ? ' open' : ''}`}>
         {navItems.map((item) => (
           <a
             key={item.id}
