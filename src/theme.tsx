@@ -7,6 +7,8 @@ interface ThemeContextValue {
   toggleTheme: () => void
 }
 
+const STORAGE_KEY = 'portfolio-theme-v2'
+
 const ThemeContext = createContext<ThemeContextValue>({
   theme: 'dark',
   toggleTheme: () => {},
@@ -14,7 +16,7 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 function readStoredTheme(): Theme {
   try {
-    return localStorage.getItem('theme') === 'light' ? 'light' : 'dark'
+    return localStorage.getItem(STORAGE_KEY) === 'light' ? 'light' : 'dark'
   } catch {
     return 'dark'
   }
@@ -28,10 +30,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('dark', isDark)
     const meta = document.querySelector('meta[name="theme-color"]')
     if (meta) {
-      meta.setAttribute('content', isDark ? '#0b0a09' : '#faf8f5')
+      meta.setAttribute('content', isDark ? '#0f0c0a' : '#faf5ee')
     }
     try {
-      localStorage.setItem('theme', theme)
+      localStorage.setItem(STORAGE_KEY, theme)
     } catch {
       /* storage unavailable — theme still applies for this session */
     }

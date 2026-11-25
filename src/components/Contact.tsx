@@ -5,7 +5,7 @@ const EMAIL = 'ryanmarcsalon04@gmail.com'
 
 function ArrowUpRightIcon() {
   return (
-    <svg className="channel-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className="channel-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M7 17 17 7M8 7h9v9" />
     </svg>
   )
@@ -29,7 +29,7 @@ function CheckIcon() {
 }
 
 export default function Contact() {
-  const sectionRef = useScrollReveal('[data-rv]', { y: 24, stagger: 0.08 })
+  const sectionRef = useScrollReveal('[data-rv]', { y: 20, stagger: 0.08 })
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -45,22 +45,18 @@ export default function Contact() {
   return (
     <section ref={sectionRef} id="contact" className="sec">
       <div className="container">
-        <div className="grid-contact">
-          <div data-rv>
+        <div className="contact-panel" data-rv>
+          <div>
             <h2 className="display h-sec">Let&apos;s Talk</h2>
             <p className="contact-lead">
-              I&apos;m finishing my 4th year of BSIT at Camiguin Polytechnic State College and actively looking for an OJT / internship where I can contribute and keep building.
+              I&apos;m finishing my 4th year of BSIT at Camiguin Polytechnic State College and actively looking for an OJT / internship where I can contribute and keep building useful software.
             </p>
 
-            <div className="contact-primary-row">
-              <a href={`mailto:${EMAIL}`} className="btn-solid">
+            <div className="contact-actions">
+              <a href={`mailto:${EMAIL}`} className="btn-primary">
                 Send an Email
               </a>
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={handleCopy}
-              >
+              <button type="button" className="btn-secondary" onClick={handleCopy}>
                 {copied ? <CheckIcon /> : <CopyIcon />}
                 <span>{copied ? 'Email Copied' : 'Copy Email'}</span>
               </button>
@@ -70,8 +66,8 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="contact-channels" data-rv>
-            <a href={`mailto:${EMAIL}`} className="channel-link">
+          <div className="channel-list">
+            <a href={`mailto:${EMAIL}`} className="channel-row">
               <span>
                 Email
                 <span className="channel-sub">{EMAIL}</span>
@@ -83,7 +79,7 @@ export default function Contact() {
               href="https://github.com/ryansalon"
               target="_blank"
               rel="noopener noreferrer"
-              className="channel-link"
+              className="channel-row"
             >
               <span>
                 GitHub
@@ -96,7 +92,7 @@ export default function Contact() {
               href="https://www.facebook.com/rynn.merxx.56884"
               target="_blank"
               rel="noopener noreferrer"
-              className="channel-link"
+              className="channel-row"
             >
               <span>
                 Facebook

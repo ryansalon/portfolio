@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { scrollToSection, subscribeActiveSection } from '../lib/scroll'
+import { subscribeActiveSection } from '../lib/scroll'
 import { useTheme } from '../theme'
 import ThemeIcon from './ThemeIcon'
 
@@ -10,46 +10,33 @@ export interface NavSection {
 
 interface NavProps {
   sections: NavSection[]
+  allSectionIds: string[]
+  currentPage: 'home' | 'achievements'
+  onNavigateHomeSection: (id: string) => void
+  onNavigateAchievements: () => void
 }
 
-export default function Nav({ sections }: NavProps) {
-  const navRef = useRef<HTMLElement>(null)
+export default function Nav({
+  sections,
+  allSectionIds,
+  currentPage,
+  onNavigateHomeSection,
+  onNavigateAchievements,
+}: NavProps) {
   const burgerRef = useRef<HTMLButtonElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeId, setActiveId] = useState(allSectionIds[0] ?? 'hero')
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    let raf = 0
-
-    const updateChrome = () => {
-      raf = 0
-      const nav = navRef.current
-      if (!nav) return
-      nav.classList.toggle('stuck', window.scrollY > 24)
-    }
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(updateChrome)
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    updateChrome()
-
-    const unsubscribe = subscribeActiveSection(setActiveIndex)
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (raf) cancelAnimationFrame(raf)
-      unsubscribe()
-    }
-  }, [])
+    return subscribeActiveSection((index) => {
+      setActiveId(allSectionIds[index] ?? 'hero')
+    })
+  }, [allSectionIds])
 
   useEffect(() => {
     document.body.classList.toggle('nav-open', menuOpen)
-    return () => {
-      document.body.classList.remove('nav-open')
-    }
+    return () => document.body.classList.remove('nav-open')
   }, [menuOpen])
 
   useEffect(() => {
@@ -64,93 +51,141 @@ export default function Nav({ sections }: NavProps) {
     return () => document.removeEventListener('keydown', onKey)
   }, [menuOpen])
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const handleSectionClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
     setMenuOpen(false)
-    scrollToSection(document.getElementById(id))
+    onNavigateHomeSection(id)
+  }
+
+  const handleAchievementsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    setMenuOpen(false)
+    onNavigateAchievements()
   }
 
   return (
     <>
-      <header>
-        <nav ref={navRef} className="nav" aria-label="Primary">
-          <div className="nav-inner">
-            <a
-              href="#hero"
-              className="nav-brand"
-              onClick={(e) => handleNavClick(e, 'hero')}
-            >
-              <span className="nav-brand-mark" aria-hidden="true">
-                &lt;R/&gt;
-              </span>
-              <span>Ryan Marc L. Salon</span>
-            </a>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <a
+            href="#hero"
+            className="brand-link"
+            onClick={(e) => handleSectionClick(e, 'hero')}
+          >
+            <span className="brand-mark" aria-hidden="true">
+              &lt;R/&gt;
+            </span>
+            <span>Ryan Marc L. Salon</span>
+          </a>
 
-            <div className="nav-links">
-              {sections.map((item, i) => (
+          <nav className="nav-links" aria-label="Primary">
+            {sections.map((item) => {
+              const isActive = currentPage === 'home' && activeId === item.id
+              return (
                 <a
                   key={item.id}
-                  className={`nav-link${i === activeIndex ? ' on' : ''}`}
+                  className={`nav-item${isActive ? ' on' : ''}`}
                   href={`#${item.id}`}
-                  aria-current={i === activeIndex ? 'location' : undefined}
-                  onClick={(e) => handleNavClick(e, item.id)}
+                  aria-current={isActive ? 'location' : undefined}
+                  onClick={(e) => handleSectionClick(e, item.id)}
                 >
                   {item.label}
                 </a>
-              ))}
-            </div>
+              )
+            })}
 
-            <div className="nav-actions">
-              <button
-                type="button"
-                className="nav-toggle"
-                onClick={toggleTheme}
-                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-              >
-                <ThemeIcon theme={theme} />
-              </button>
+            <a
+              className={`nav-item${currentPage === 'achievements' ? ' on' : ''}`}
+              href="#/achievements"
+              aria-current={currentPage === 'achievements' ? 'page' : undefined}
+              onClick={handleAchievementsClick}
+            >
+              Achievements
+            </a>
+          </nav>
 
-              <button
-                ref={burgerRef}
-                type="button"
-                className={`nav-burger${menuOpen ? ' active' : ''}`}
-                onClick={() => setMenuOpen((prev) => !prev)}
-                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                aria-expanded={menuOpen}
-                aria-controls="mobile-nav"
-              >
-                <i />
-                <i />
-              </button>
-            </div>
+          <div className="nav-controls">
+            <button
+              type="button"
+              className="theme-btn"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+            >
+              <ThemeIcon theme={theme} />
+            </button>
+
+            <a
+              href="#contact"
+              className="nav-cta-btn"
+              onClick={(e) => handleSectionClick(e, 'contact')}
+            >
+              Contact Me
+            </a>
+
+            <button
+              ref={burgerRef}
+              type="button"
+              className={`burger-btn${menuOpen ? ' active' : ''}`}
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-drawer"
+            >
+              <i />
+              <i />
+            </button>
           </div>
-        </nav>
+        </div>
       </header>
 
       <div
-        className={`nav-backdrop${menuOpen ? ' open' : ''}`}
+        className={`mobile-backdrop${menuOpen ? ' open' : ''}`}
         onClick={() => setMenuOpen(false)}
         aria-hidden="true"
       />
 
       <nav
-        id="mobile-nav"
-        className={`nav-panel${menuOpen ? ' open' : ''}`}
+        id="mobile-drawer"
+        className={`mobile-drawer${menuOpen ? ' open' : ''}`}
         aria-label="Mobile"
         aria-hidden={!menuOpen}
       >
-        {sections.map((item, i) => (
-          <a
-            key={item.id}
-            className={`nav-link${i === activeIndex ? ' on' : ''}`}
-            href={`#${item.id}`}
-            tabIndex={menuOpen ? 0 : -1}
-            aria-current={i === activeIndex ? 'location' : undefined}
-            onClick={(e) => handleNavClick(e, item.id)}
-          >
-            {item.label}
-          </a>
-        ))}
+        {sections.map((item) => {
+          const isActive = currentPage === 'home' && activeId === item.id
+          return (
+            <a
+              key={item.id}
+              className={`nav-item${isActive ? ' on' : ''}`}
+              href={`#${item.id}`}
+              tabIndex={menuOpen ? 0 : -1}
+              aria-current={isActive ? 'location' : undefined}
+              onClick={(e) => handleSectionClick(e, item.id)}
+            >
+              {item.label}
+            </a>
+          )
+        })}
+
+        <a
+          className={`nav-item${currentPage === 'achievements' ? ' on' : ''}`}
+          href="#/achievements"
+          tabIndex={menuOpen ? 0 : -1}
+          aria-current={currentPage === 'achievements' ? 'page' : undefined}
+          onClick={handleAchievementsClick}
+        >
+          Achievements
+        </a>
+
+        <a
+          href="#contact"
+          className="btn-primary"
+          style={{ marginTop: '24px' }}
+          tabIndex={menuOpen ? 0 : -1}
+          onClick={(e) => handleSectionClick(e, 'contact')}
+        >
+          Contact Me
+        </a>
       </nav>
     </>
   )

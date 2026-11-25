@@ -1,155 +1,191 @@
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
-interface TimelineItem {
-  title: string
-  sub: string
-  year: string
-  badge?: string
-}
-
-/* Edit these arrays to update your details */
-const currentFocus: TimelineItem[] = [
-  {
-    title: 'BS Information Technology — 4th Year',
-    sub: 'Camiguin Polytechnic State College',
-    year: '2026',
-    badge: 'Current',
-  },
-  {
-    title: 'OJT / Internship',
-    sub: 'Actively seeking placement in web development',
-    year: 'Open',
-  },
-  {
-    title: 'Capstone Project',
-    sub: 'Design and Development of a Smart Barangay Health Monitoring Kiosk for Basic Vital Signs Assessment and BMI Computation',
-    year: 'Ongoing',
-  },
+const aboutParagraphs = [
+  "I'm a 4th-year BS Information Technology student at Camiguin Polytechnic State College who enjoys building reliable software for the web. I got into full-stack development because I like turning practical requirements into working systems people can use every day.",
+  'I learn by shipping. Most of what I know comes from building real systems: an IoT-backed barangay health monitoring platform, a campus outpatient clinic manager, a municipal payroll platform, a voting system, an online storefront for a local bakeshop, and an interactive Camiguin tourism map.',
+  "Right now I'm finishing my degree and actively seeking an OJT / internship where I can contribute to an engineering team, learn strong production habits, and keep growing.",
 ]
 
-const education: TimelineItem[] = [
-  {
-    title: 'Camiguin Polytechnic State College',
-    sub: 'BS Information Technology',
-    year: 'Present',
-  },
-  {
-    title: 'Columbia St. Michaels Parish High School',
-    sub: 'Senior High School — GAS Strand',
-    year: '2021–2022',
-  },
-]
-
-const stack = [
+const stackGroups = [
   {
     label: 'Frontend',
-    techs: ['React', 'Next.js', 'Tailwind CSS', 'JavaScript', 'HTML', 'CSS', 'Leaflet'],
+    items: ['React', 'Next.js', 'Tailwind CSS', 'JavaScript', 'HTML', 'CSS', 'Leaflet'],
   },
   {
     label: 'Backend',
-    techs: ['PHP', 'CodeIgniter', 'Node.js', 'MySQL'],
+    items: ['PHP', 'CodeIgniter', 'Node.js', 'MySQL', 'IoT Web Integration'],
   },
   {
     label: 'Tools',
-    techs: ['GitHub', 'VS Code', 'XAMPP'],
+    items: ['GitHub', 'VS Code', 'Antigravity', 'XAMPP'],
+  },
+  {
+    label: 'AI',
+    items: ['Ollama', 'Gemini', 'Claude', 'OpenCode', 'DeepSeek'],
   },
 ]
 
-const aboutParagraphs = [
-  "I'm a 4th-year BS Information Technology student at Camiguin Polytechnic State College who enjoys building things for the web. I got into full-stack development because I like seeing an idea turn into something real — something people can actually use.",
-  'I learn by doing. I pick up a tool, break it, figure out why, and keep going. Most of what I know comes from shipping real projects: a voting system, an online storefront for a local bakeshop, and a tourism guide that maps Camiguin’s best destinations.',
-  "Right now I'm finishing my degree and actively looking for an OJT / internship where I can apply what I've been building. I'm based in Poblacion, Mahinog, Camiguin, Philippines — early in the journey, but genuinely excited about where it's going.",
+const competitionHighlights = [
+  {
+    rank: '1st / 9',
+    name: 'Annual Reverse Pitching — Champion',
+    meta: 'CTRL+Ventures · Winning pitch: eGABAY Digital Health & Social Welfare System',
+  },
+  {
+    rank: 'Top 20',
+    name: 'Philippine Startup Challenge XI (Region 10)',
+    meta: 'Regional Pitching Competition Finalist · DICT & Startup PH',
+  },
+  {
+    rank: '6th / 12',
+    name: 'Hack4Gov 5 — Cybersecurity CTF',
+    meta: '500 Points Captured · Team Phish & Chips · DICT',
+  },
+  {
+    rank: 'Awarded',
+    name: 'Tech-Tuesdays — MSME Digitalization Pitch',
+    meta: 'Certificate of Appreciation · DICT Region 10 & DTI Philippines',
+  },
 ]
 
-function Timeline({ items }: { items: TimelineItem[] }) {
+interface DashboardProps {
+  onOpenAchievements: () => void
+}
+
+function ArrowRightIcon() {
   return (
-    <div className="timeline">
-      {items.map((item) => (
-        <div key={item.title} className={`tl-item${item.badge ? ' is-active' : ''}`}>
-          <span className="tl-marker" aria-hidden="true">
-            <i className="tl-dot" />
-          </span>
-          <div className="tl-body">
-            <div className="tl-text">
-              <h4 className="tl-title">{item.title}</h4>
-              <p className="tl-sub">{item.sub}</p>
-            </div>
-            {item.badge ? (
-              <span className="tl-badge">{item.badge}</span>
-            ) : (
-              <span className="tl-year">{item.year}</span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
   )
 }
 
-export default function Dashboard() {
-  const sectionRef = useScrollReveal('[data-rv]', { y: 24, stagger: 0.08 })
+export function AboutSection() {
+  const aboutRef = useScrollReveal('[data-rv]', { y: 20, stagger: 0.08 })
 
   return (
-    <section ref={sectionRef} id="about" className="sec">
+    <section ref={aboutRef} id="about" className="sec sec-alt">
       <div className="container">
-        <div className="sec-title-row" data-rv>
-          <h2 className="display h-sec">About &amp; Background</h2>
-          <span className="sec-meta">Coding since 2023</span>
+        <div className="sec-head-row" data-rv>
+          <h2 className="display h-sec">About &amp; Technical Profile</h2>
         </div>
 
-        <div className="profile-layout">
+        <div className="about-grid">
           <div data-rv>
-            <div className="about-text">
-              {aboutParagraphs.map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
+            <div className="profile-block">
+              <h3 className="sub-heading">Background</h3>
+              <div className="prose">
+                {aboutParagraphs.map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
             </div>
 
-            <div className="profile-facts">
-              <div className="profile-fact">
-                <b>3+ Years</b>
-                <span>Building for the web</span>
-              </div>
-              <div className="profile-fact">
-                <b>4th Year</b>
-                <span>BSIT at CPSC</span>
-              </div>
-              <div className="profile-fact">
-                <b>3 Shipped</b>
-                <span>Community web apps</span>
+            <div className="profile-block">
+              <h3 className="sub-heading">Technical Stack</h3>
+              <div className="stack-table">
+                {stackGroups.map((group) => (
+                  <div key={group.label} className="stack-table-row">
+                    <span className="stack-cat">{group.label}</span>
+                    <div className="stack-items">
+                      {group.items.map((tech) => (
+                        <span key={tech} className="stack-pill">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          <div className="profile-sidebar">
-            <div data-rv>
-              <h3 className="sub-heading">Current Focus</h3>
-              <Timeline items={currentFocus} />
-            </div>
+          <div data-rv>
+            <div className="profile-block">
+              <h3 className="sub-heading">Education &amp; Milestones</h3>
+              <div className="timeline-list">
+                <div className="timeline-row">
+                  <div>
+                    <h4>Smart Barangay Health Monitoring Kiosk</h4>
+                    <p>Defended IoT &amp; web capstone for basic vital signs assessment and BMI computation · CPSC &amp; RHU Mahinog</p>
+                  </div>
+                  <span className="badge-accent">Defended</span>
+                </div>
 
-            <div data-rv>
-              <h3 className="sub-heading">Education</h3>
-              <Timeline items={education} />
-            </div>
-          </div>
-        </div>
+                <div className="timeline-row">
+                  <div>
+                    <h4>BS Information Technology — 4th Year</h4>
+                    <p>Camiguin Polytechnic State College</p>
+                  </div>
+                  <span className="mono-meta">Present</span>
+                </div>
 
-        <div className="stack-band" data-rv>
-          <h3 className="sub-heading">Tech Stack</h3>
-          <div className="stack-grid">
-            {stack.map((group) => (
-              <div key={group.label}>
-                <h4 className="stack-group-title">{group.label}</h4>
-                <div className="stack-pills">
-                  {group.techs.map((tech) => (
-                    <span key={tech} className="stack-pill">
-                      {tech}
-                    </span>
-                  ))}
+                <div className="timeline-row">
+                  <div>
+                    <h4>OJT / Internship</h4>
+                    <p>Actively seeking web development placement</p>
+                  </div>
+                  <span className="badge-neutral">Open</span>
+                </div>
+
+                <div className="timeline-row">
+                  <div>
+                    <h4>Senior High School — GAS Strand</h4>
+                    <p>Columbia St. Michaels Parish High School</p>
+                  </div>
+                  <span className="mono-meta">2021–2022</span>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export function AchievementsTeaser({ onOpenAchievements }: DashboardProps) {
+  const winsRef = useScrollReveal('[data-rv]', { y: 20, stagger: 0.07 })
+
+  return (
+    <section ref={winsRef} className="sec sec-alt" aria-label="Competitions and achievements">
+      <div className="container">
+        <div className="sec-head-row" data-rv>
+          <div>
+            <h2 className="display h-sec">Competitions &amp; Achievements</h2>
+            <p className="sec-intro">
+              Regional startup pitching, cybersecurity Capture the Flag, and MSME digitalization initiatives.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={onOpenAchievements}
+          >
+            View Photos &amp; Details
+            <ArrowRightIcon />
+          </button>
+        </div>
+
+        <div className="ach-ledger" data-rv>
+          {competitionHighlights.map((item) => (
+            <button
+              key={item.name}
+              type="button"
+              className="ach-ledger-row"
+              onClick={onOpenAchievements}
+            >
+              <span className="ach-rank-cell">{item.rank}</span>
+              <span className="ach-title-cell">
+                <strong>{item.name}</strong>
+                <span>{item.meta}</span>
+              </span>
+              <span className="ach-arrow" aria-hidden="true">
+                <ArrowRightIcon />
+              </span>
+            </button>
+          ))}
         </div>
       </div>
     </section>
