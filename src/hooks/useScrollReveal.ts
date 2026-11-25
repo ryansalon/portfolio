@@ -9,7 +9,6 @@ interface ScrollRevealOptions {
   y?: number
   duration?: number
   stagger?: number
-  delay?: number
   start?: string
 }
 
@@ -19,13 +18,7 @@ export function useScrollReveal(
 ) {
   const ref = useRef<HTMLElement>(null)
   const reducedMotion = usePrefersReducedMotion()
-  const {
-    y = 22,
-    duration = 0.72,
-    stagger = 0.08,
-    delay = 0,
-    start = 'top 86%',
-  } = opts
+  const { y = 20, duration = 0.72, stagger = 0.08, start = 'top 86%' } = opts
 
   useEffect(() => {
     const container = ref.current
@@ -39,7 +32,6 @@ export function useScrollReveal(
       y,
       duration,
       stagger,
-      delay,
       ease: 'expo.out',
       clearProps: 'transform,opacity',
       scrollTrigger: {
@@ -53,7 +45,7 @@ export function useScrollReveal(
       anim.scrollTrigger?.kill()
       anim.kill()
     }
-  }, [selector, y, duration, stagger, delay, start, reducedMotion])
+  }, [selector, y, duration, stagger, start, reducedMotion])
 
   return ref
 }
