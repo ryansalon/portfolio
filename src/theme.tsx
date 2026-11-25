@@ -24,7 +24,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(readStoredTheme)
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark')
+    const isDark = theme === 'dark'
+    document.documentElement.classList.toggle('dark', isDark)
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) {
+      meta.setAttribute('content', isDark ? '#0b0a09' : '#faf8f5')
+    }
     try {
       localStorage.setItem('theme', theme)
     } catch {

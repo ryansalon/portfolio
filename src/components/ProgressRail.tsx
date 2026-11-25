@@ -1,31 +1,37 @@
 import { useEffect, useState } from 'react'
 import { scrollToSection, subscribeActiveSection } from '../lib/scroll'
+import type { NavSection } from './Nav'
 
 interface ProgressRailProps {
-  sectionIds: string[]
+  sections: NavSection[]
 }
 
-export default function ProgressRail({ sectionIds }: ProgressRailProps) {
+export default function ProgressRail({ sections }: ProgressRailProps) {
   const [active, setActive] = useState(0)
 
   useEffect(() => subscribeActiveSection(setActive), [])
 
-  const scrollTo = (index: number) => {
-    scrollToSection(document.getElementById(sectionIds[index]))
+  const scrollTo = (id: string) => {
+    scrollToSection(document.getElementById(id))
   }
 
   return (
-    <div className="rail">
-      {sectionIds.map((id, i) => (
+    <aside className="rail" aria-label="Section progress">
+      {sections.map((sec, i) => (
         <button
-          key={id}
+          key={sec.id}
+          type="button"
           className={i === active ? 'on' : ''}
-          onClick={() => scrollTo(i)}
-          aria-label={`Section ${i + 1}`}
+          onClick={() => scrollTo(sec.id)}
+          aria-label={`Jump to ${sec.label}`}
+          aria-current={i === active ? 'location' : undefined}
         >
-          <i />
+          <span className="rail-label" aria-hidden="true">
+            {sec.label}
+          </span>
+          <i aria-hidden="true" />
         </button>
       ))}
-    </div>
+    </aside>
   )
 }

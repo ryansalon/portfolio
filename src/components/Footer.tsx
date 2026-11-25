@@ -1,14 +1,30 @@
-import { useScrollReveal } from '../hooks/useScrollReveal'
+import { scrollToSection } from '../lib/scroll'
+
+function ArrowUpIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 19V5M6 11l6-6 6 6" />
+    </svg>
+  )
+}
 
 export default function Footer() {
-  const sectionRef = useScrollReveal('[data-rv]', { y: 20, duration: 0.8 })
-
   return (
-    <footer ref={sectionRef} className="foot">
-      <div data-rv style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          © 2026 Ryan Marc Salon. Precision Built.
-        </p>
+    <footer className="foot">
+      <div className="container">
+        <div className="foot-inner">
+          <p style={{ margin: 0 }}>
+            &copy; 2026 Ryan Marc L. Salon &middot; Poblacion, Mahinog, Camiguin
+          </p>
+          <button
+            type="button"
+            className="foot-top"
+            onClick={() => scrollToSection(document.getElementById('hero'))}
+          >
+            Back to top
+            <ArrowUpIcon />
+          </button>
+        </div>
       </div>
     </footer>
   )

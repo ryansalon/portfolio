@@ -1,14 +1,29 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
-import { useTheme } from '../theme'
-import ParticleBackground from './ParticleBackground'
-import ThemeIcon from './ThemeIcon'
+import { scrollToSection } from '../lib/scroll'
 
 function LocationPin() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11Z" />
+      <circle cx="12" cy="10" r="2.2" />
+    </svg>
+  )
+}
+
+function ArrowDownIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 5v14M6 13l6 6 6-6" />
+    </svg>
+  )
+}
+
+function ArrowUpRightIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 17 17 7M8 7h9v9" />
     </svg>
   )
 }
@@ -16,68 +31,88 @@ function LocationPin() {
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
   const reducedMotion = usePrefersReducedMotion()
-  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const items = sectionRef.current?.querySelectorAll('.hero-reveal')
-    if (!items?.length) return
+    if (!items?.length || reducedMotion) return
 
-    if (reducedMotion) {
-      gsap.set(items, { opacity: 1, y: 0, filter: 'none' })
-      return
-    }
-
-    items.forEach((el, i) => {
-      gsap.fromTo(el,
-        { opacity: 0, y: 50, filter: 'blur(8px)' },
-        { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.3, delay: 1.9 + i * 0.11, ease: 'power3.out' }
-      )
+    const anim = gsap.from(items, {
+      opacity: 0,
+      y: 22,
+      duration: 0.72,
+      stagger: 0.065,
+      ease: 'expo.out',
+      clearProps: 'transform,opacity',
     })
+
+    return () => {
+      anim.kill()
+    }
   }, [reducedMotion])
 
+  const handleViewProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    scrollToSection(document.getElementById('projects'))
+  }
+
   return (
-    <section ref={sectionRef} id="hero" className="hero landing">
-      <ParticleBackground />
+    <section ref={sectionRef} id="hero" className="hero">
+      <div className="container">
+        <div className="landing-grid">
+          <figure className="landing-pfp hero-reveal">
+            <img
+              src="/assets/pfp.jpg"
+              alt="Portrait of Ryan Marc L. Salon"
+              width={224}
+              height={224}
+              fetchPriority="high"
+              decoding="async"
+            />
+          </figure>
 
-      <header className="landing-head hero-reveal">
-        <span className="rule-grad" />
-        <span className="lbl">Ryan Marc L. Salon || Portfolio 2026</span>
-        <span className="rule-grad right" />
-      </header>
+          <div className="landing-copy">
+            <h1 className="landing-name hero-reveal">Ryan Marc L. Salon</h1>
 
-      <div className="landing-grid">
-        <figure className="landing-pfp hero-reveal" data-cursor>
-          <img src="/assets/pfp.jpg" alt="Ryan Marc L. Salon" fetchPriority="high" decoding="async" />
-        </figure>
+            <p className="landing-role hero-reveal">
+              Aspiring Full Stack Developer building practical web applications for local communities and businesses.
+            </p>
 
-        <div className="landing-copy">
-          <h1 className="landing-name hero-reveal">Ryan Marc L. Salon</h1>
+            <div className="landing-meta hero-reveal">
+              <span className="status-badge">
+                <span className="status-dot" aria-hidden="true" />
+                4th-Year BSIT · Open for OJT / Internship
+              </span>
+              <span className="landing-loc">
+                <LocationPin />
+                <span>Poblacion, Mahinog, Camiguin, Philippines</span>
+              </span>
+            </div>
 
-          <p className="landing-role hero-reveal">
-            Aspiring Full Stack Developer
-          </p>
+            <div className="landing-actions hero-reveal">
+              <a
+                href="#projects"
+                onClick={handleViewProjects}
+                className="btn-solid"
+              >
+                View Projects
+                <ArrowDownIcon />
+              </a>
 
-          <p className="landing-loc hero-reveal">
-            <LocationPin />
-            <span>Poblacion, Mahinog, Camiguin, Philippines</span>
-          </p>
+              <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-ghost">
+                Email Me
+              </a>
 
-          <div className="landing-actions hero-reveal">
-            <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-solid" data-cursor>
-              Email Me
-            </a>
+              <a
+                href="https://github.com/ryansalon"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-link"
+              >
+                GitHub
+                <ArrowUpRightIcon />
+              </a>
+            </div>
           </div>
-
-          <button
-            className={`theme-pill hero-reveal${theme === 'dark' ? ' is-dark' : ''}`}
-            onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-            data-cursor
-          >
-            <span className="knob">
-              <ThemeIcon theme={theme} />
-            </span>
-          </button>
         </div>
       </div>
     </section>

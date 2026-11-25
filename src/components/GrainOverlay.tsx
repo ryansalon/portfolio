@@ -39,5 +39,5 @@ export default function GrainOverlay() {
     }
   }, [])
 
-  return <div ref={ref} id="grain" />
+  return <div ref={ref} id="grain" aria-hidden="true" />
 }

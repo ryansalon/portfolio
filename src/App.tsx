@@ -5,31 +5,30 @@ import Lenis from 'lenis'
 import { usePrefersReducedMotion } from './hooks/useReducedMotion'
 import { setLenis, startActiveSectionTracking } from './lib/scroll'
 import { ThemeProvider } from './theme'
-import Preloader from './components/Preloader'
 import GrainOverlay from './components/GrainOverlay'
-import Vignette from './components/Vignette'
-import CustomCursor from './components/CustomCursor'
 import ProgressRail from './components/ProgressRail'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import Dashboard from './components/Dashboard'
 import Projects from './components/Projects'
-import Manifesto from './components/Manifesto'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SECTION_IDS = ['hero', 'about', 'projects', 'manifesto', 'contact']
+const SECTIONS = [
+  { id: 'hero', label: 'Home' },
+  { id: 'about', label: 'Profile' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'contact', label: 'Contact' },
+]
+
+const SECTION_IDS = SECTIONS.map((s) => s.id)
 
 function App() {
   const reducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual'
-    }
-    window.scrollTo(0, 0)
     startActiveSectionTracking(SECTION_IDS)
 
     if (reducedMotion) {
@@ -38,13 +37,13 @@ function App() {
     }
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.05,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 1.8,
       infinite: false,
     })
     setLenis(lenis)
@@ -73,20 +72,19 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Preloader />
+      <a href="#about" className="skip-link">
+        Skip to content
+      </a>
       <GrainOverlay />
-      <Vignette />
-      <CustomCursor />
-      <ProgressRail sectionIds={SECTION_IDS} />
-      <Nav sectionIds={SECTION_IDS} />
-      <div className="page">
+      <ProgressRail sections={SECTIONS} />
+      <Nav sections={SECTIONS} />
+      <main className="page">
         <Hero />
         <Dashboard />
         <Projects />
-        <Manifesto />
         <Contact />
-        <Footer />
-      </div>
+      </main>
+      <Footer />
     </ThemeProvider>
   )
 }

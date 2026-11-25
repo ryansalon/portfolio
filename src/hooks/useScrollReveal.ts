@@ -7,15 +7,10 @@ gsap.registerPlugin(ScrollTrigger)
 
 interface ScrollRevealOptions {
   y?: number
-  opacity?: number
-  scale?: number
-  rotateX?: number
   duration?: number
   stagger?: number
   delay?: number
-  ease?: string
   start?: string
-  scrub?: boolean | number
 }
 
 export function useScrollReveal(
@@ -24,77 +19,33 @@ export function useScrollReveal(
 ) {
   const ref = useRef<HTMLElement>(null)
   const reducedMotion = usePrefersReducedMotion()
+  const {
+    y = 22,
+    duration = 0.72,
+    stagger = 0.08,
+    delay = 0,
+    start = 'top 86%',
+  } = opts
 
   useEffect(() => {
     const container = ref.current
-    if (!container) return
-
-    const {
-      y = 50,
-      opacity = 0,
-      scale = 0.96,
-      rotateX = 0,
-      duration = 1.2,
-      stagger = 0.1,
-      delay = 0,
-      ease = 'power3.out',
-      start = 'top 88%',
-      scrub = false,
-    } = opts
+    if (!container || reducedMotion) return
 
     const els = container.querySelectorAll(selector)
     if (!els.length) return
 
-    if (reducedMotion) {
-      gsap.set(els, { opacity: 1, y: 0, scale: 1, rotateX: 0, clearProps: 'transform' })
-      return
-    }
-
-    const anims = gsap.fromTo(
-      els,
-      { opacity, y, scale, rotateX, transformPerspective: rotateX ? 800 : undefined },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        rotateX: 0,
-        duration,
-        stagger,
-        delay,
-        ease,
-        scrollTrigger: {
-          trigger: container,
-          start,
-          toggleActions: 'play none none none',
-          scrub,
-        },
-      }
-    )
-
-    return () => {
-      anims.scrollTrigger?.kill()
-      anims.kill()
-    }
-  }, [selector, JSON.stringify(opts), reducedMotion])
-
-  return ref
-}
-
-export function useParallax(distance: number = 40) {
-  const ref = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    const anim = gsap.to(el, {
-      y: distance,
-      ease: 'none',
+    const anim = gsap.from(els, {
+      opacity: 0,
+      y,
+      duration,
+      stagger,
+      delay,
+      ease: 'expo.out',
+      clearProps: 'transform,opacity',
       scrollTrigger: {
-        trigger: el,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
+        trigger: container,
+        start,
+        once: true,
       },
     })
 
@@ -102,7 +53,7 @@ export function useParallax(distance: number = 40) {
       anim.scrollTrigger?.kill()
       anim.kill()
     }
-  }, [distance])
+  }, [selector, y, duration, stagger, delay, start, reducedMotion])
 
   return ref
 }
