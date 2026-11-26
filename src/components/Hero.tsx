@@ -20,6 +20,14 @@ function ArrowUpRightIcon() {
   )
 }
 
+function ArrowDownIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 5v14M6 13l6 6 6-6" />
+    </svg>
+  )
+}
+
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
   const reducedMotion = usePrefersReducedMotion()
@@ -42,9 +50,9 @@ export default function Hero() {
     }
   }, [reducedMotion])
 
-  const goToWork = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const goToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
-    scrollToSection(document.getElementById('work'))
+    scrollToSection(document.getElementById(id))
   }
 
   return (
@@ -58,10 +66,10 @@ export default function Hero() {
             </div>
 
             <h1 className="hero-h1 hero-rv">Ryan Marc L. Salon</h1>
-            <p className="hero-role hero-rv">Full-Stack Web Developer</p>
+            <p className="hero-role hero-rv">Web Developer &middot; Internix IT Solutions</p>
 
             <p className="hero-lead hero-rv">
-              4th-year BS Information Technology student at Camiguin Polytechnic State College building civic, healthcare, LGU, and local business web applications — backed by a defended IoT + web capstone.
+              4th-year BS Information Technology student at Camiguin Polytechnic State College and developer for Internix IT Solutions — Camiguin&apos;s first DICT-incubated startup building web systems for LGUs and MSMEs — backed by a defended IoT + web capstone.
             </p>
 
             <div className="hero-meta-row hero-rv">
@@ -72,7 +80,7 @@ export default function Hero() {
             </div>
 
             <div className="hero-actions hero-rv">
-              <a href="#work" className="btn-primary" onClick={goToWork}>
+              <a href="#work" className="btn-primary" onClick={(e) => goToSection(e, 'work')}>
                 View Projects
               </a>
               <a href="mailto:ryanmarcsalon04@gmail.com" className="btn-secondary">
@@ -95,34 +103,24 @@ export default function Hero() {
               <img
                 src="/assets/pfp.jpg"
                 alt="Portrait of Ryan Marc L. Salon"
-                width={246}
-                height={270}
+                width={286}
+                height={314}
                 fetchPriority="high"
                 decoding="async"
               />
             </figure>
           </div>
         </div>
-
-        <div className="summary-bar">
-          <div className="summary-item hero-rv">
-            <b>6 Systems</b>
-            <span>Shipped web &amp; civic projects</span>
-          </div>
-          <div className="summary-item hero-rv">
-            <b>1st / 9 Teams</b>
-            <span>Annual Reverse Pitching Champion</span>
-          </div>
-          <div className="summary-item hero-rv">
-            <b>Top 20</b>
-            <span>PSC XI Regional Finalist (R10)</span>
-          </div>
-          <div className="summary-item hero-rv">
-            <b>Defended</b>
-            <span>IoT &amp; Web Health Kiosk Capstone</span>
-          </div>
-        </div>
       </div>
+
+      <a
+        href="#about"
+        className="hero-scroll-hint hero-rv"
+        onClick={(e) => goToSection(e, 'about')}
+      >
+        <span>Scroll to explore</span>
+        <ArrowDownIcon />
+      </a>
     </section>
   )
 }
