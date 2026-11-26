@@ -22,6 +22,29 @@ interface Competition {
 /** Add more competitions here — they render automatically on this page */
 const competitions: Competition[] = [
   {
+    id: 'outstanding-youth-innovators',
+    title: 'Outstanding Youth Innovators Award',
+    organizer: 'DICT Camiguin · Awarded by Engr. James Kevin M. Sagocsoc (Provincial Officer)',
+    team: 'Internix IT Solutions',
+    placement: 'Pioneering Startup Award',
+    score: 'June 25, 2026',
+    summary:
+      'Presented to Internix by the Provincial Officer of DICT Camiguin at Camiguin Polytechnic State College in recognition of our historic milestone as the pioneering tech startup of Camiguin — from incubation under DICT Camiguin to scaling up into the province’s premier youth-led ICT startup.',
+    highlights: [
+      { value: '1st Startup', label: 'Pioneering Tech Startup in Camiguin' },
+      { value: 'DICT Camiguin', label: 'Provincial Officer Recognition' },
+      { value: 'June 2026', label: 'Awarded at CPSC, Mambajao' },
+    ],
+    tags: ['Outstanding Youth Innovators', 'Internix IT Solutions', 'DICT Camiguin', 'Youth-Led Innovation'],
+    photos: [
+      {
+        src: '/assets/awards/outstanding-youth-innovators.jpg',
+        alt: 'Outstanding Youth Innovators Award plaque presented to Internix by Engr. James Kevin M. Sagocsoc, Provincial Officer of DICT Camiguin',
+        caption: 'Outstanding Youth Innovators Award presented to Internix by DICT Camiguin Provincial Officer Engr. James Kevin M. Sagocsoc',
+      },
+    ],
+  },
+  {
     id: 'reverse-pitching',
     title: 'Annual Reverse Pitching — Champion',
     organizer: 'Regional Reverse Pitching Competition',
@@ -66,6 +89,44 @@ const competitions: Competition[] = [
         src: '/assets/reverse-pitching/bts.jpg',
         alt: 'Candid behind-the-scenes moment of the team captured through a camera viewfinder',
         caption: 'Behind-the-scenes moment captured during the event',
+      },
+    ],
+  },
+  {
+    id: 'rstw-2026',
+    title: '2026 RSTW — 3-Day Startup Exhibitor',
+    organizer: 'DOST Northern Mindanao · Partnered with DICT Camiguin',
+    team: 'Internix IT Solutions (DICT-Incubated Startup)',
+    placement: '3-Day Exhibitor',
+    score: 'Plaque of Appreciation',
+    summary:
+      'Participated for 3 full days at the 2026 Regional Science, Technology, and Innovation Week (RSTW) in Mambajao, Camiguin as a developer representing Internix IT Solutions — Camiguin’s first DICT-incubated startup building systems for LGUs and MSMEs. Partnered directly with DICT Camiguin in a shared exhibition booth and received the DOST Plaque of Appreciation.',
+    highlights: [
+      { value: '3 Days', label: 'Regional Tech Exhibition' },
+      { value: 'DICT Partner', label: 'Shared Booth in Camiguin' },
+      { value: 'Plaque', label: 'DOST Appreciation Award' },
+    ],
+    tags: ['Internix IT Solutions', 'DICT Incubated', '2026 RSTW', 'DOST', 'LGU & MSME Systems'],
+    photos: [
+      {
+        src: '/assets/rstw/booth-plaque.jpg',
+        alt: '2026 RSTW Plaque of Appreciation held in front of the Internix IT Solutions and DICT Camiguin exhibition booth',
+        caption: 'Internix IT Solutions & DICT Camiguin booth with the 2026 RSTW Plaque of Appreciation',
+      },
+      {
+        src: '/assets/rstw/booth-full.jpg',
+        alt: 'Full view of the shared Internix IT Solutions and DICT Camiguin exhibition booth at 2026 RSTW',
+        caption: 'Our shared Internix IT Solutions & DICT Camiguin exhibition booth during the 3-day RSTW event',
+      },
+      {
+        src: '/assets/rstw/stage-1.jpg',
+        alt: 'Internix IT Solutions team on stage at 2026 RSTW holding the Plaque of Appreciation',
+        caption: 'Team on the 2026 RSTW stage celebrating our 3-day exhibition showcase',
+      },
+      {
+        src: '/assets/rstw/stage-2.jpg',
+        alt: 'Team celebrating under the stage lights with the 2026 RSTW trophy plaque',
+        caption: 'Closing night with the 2026 RSTW DOST appreciation award',
       },
     ],
   },
@@ -314,15 +375,17 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
 
               <div
                 className={`comp-photo-grid${
-                  comp.photos.length === 2
-                    ? ' is-duo'
-                    : comp.photos.length === 3
-                      ? ' is-trio'
-                      : comp.photos.length === 4
-                        ? ' is-quad'
-                        : comp.photos.length === 6
-                          ? ' is-six'
-                          : ''
+                  comp.photos.length === 1
+                    ? ' is-single'
+                    : comp.photos.length === 2
+                      ? ' is-duo'
+                      : comp.photos.length === 3
+                        ? ' is-trio'
+                        : comp.photos.length === 4
+                          ? ' is-quad'
+                          : comp.photos.length === 6
+                            ? ' is-six'
+                            : ''
                 }`}
               >
                 {comp.photos.map((photo, idx) => (
@@ -376,34 +439,36 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() =>
-                  setLightbox((prev) =>
-                    prev
-                      ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length }
-                      : null
-                  )
-                }
-              >
-                <ChevronLeftIcon />
-                Previous
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() =>
-                  setLightbox((prev) =>
-                    prev ? { ...prev, index: (prev.index + 1) % prev.photos.length } : null
-                  )
-                }
-              >
-                Next
-                <ChevronRightIcon />
-              </button>
-            </div>
+            {lightbox.photos.length > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() =>
+                    setLightbox((prev) =>
+                      prev
+                        ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length }
+                        : null
+                    )
+                  }
+                >
+                  <ChevronLeftIcon />
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() =>
+                    setLightbox((prev) =>
+                      prev ? { ...prev, index: (prev.index + 1) % prev.photos.length } : null
+                    )
+                  }
+                >
+                  Next
+                  <ChevronRightIcon />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -47,11 +47,13 @@ Visitors scan the portfolio on laptops and mobile phones during workdays or even
   4. Camiguin Tourism (`public/assets/camiguin-tourism.webp`) — Next.js + Leaflet interactive island map guide.
   5. Pacudan Bakeshop (`public/assets/pacudan-bakeshop.webp`) — Local e-commerce storefront.
   6. Voting System (`public/assets/voting-system.webp`) — PHP + MySQL ballot casting & tallying system.
-- **4 Verified Competitions & Achievements:**
-  1. Annual Reverse Pitching — Champion (1st / 9 Teams, CTRL+Ventures, eGABAY pitch; 6 photos in `public/assets/reverse-pitching/`).
-  2. Philippine Startup Challenge XI (R10) — Top 20 Finalist (4 photos in `public/assets/psc-xi/`).
-  3. Hack4Gov 5 — 6th Place / 12 Teams, 500 Points (Team Phish & Chips, DICT; 5 photos in `public/assets/hack4gov/`).
-  4. Tech-Tuesdays — MSME Digitalization Pitch, Certificate of Appreciation (DICT Region 10 & DTI; 2 photos in `public/assets/tech-tuesday/`).
+- **6 Verified Competitions, Exhibitions & Awards:**
+  1. Outstanding Youth Innovators Award — Presented to Internix by DICT Camiguin Provincial Officer Engr. James Kevin M. Sagocsoc (June 25, 2026 at CPSC; `public/assets/awards/outstanding-youth-innovators.jpg`).
+  2. Annual Reverse Pitching — Champion (1st / 9 Teams, CTRL+Ventures, eGABAY pitch; 6 photos in `public/assets/reverse-pitching/`).
+  3. 2026 RSTW — 3-Day Startup Exhibitor as Internix IT Solutions (Camiguin's first DICT-incubated startup for LGU & MSME systems, partnered with DICT Camiguin in a shared booth, DOST Plaque of Appreciation; 4 photos in `public/assets/rstw/`).
+  4. Philippine Startup Challenge XI (R10) — Top 20 Finalist (4 photos in `public/assets/psc-xi/`).
+  5. Hack4Gov 5 — 6th Place / 12 Teams, 500 Points (Team Phish & Chips, DICT; 5 photos in `public/assets/hack4gov/`).
+  6. Tech-Tuesdays — MSME Digitalization Pitch, Certificate of Appreciation (DICT Region 10 & DTI; 2 photos in `public/assets/tech-tuesday/`).
 - **Absences not to fabricate:** Individual project live URLs/GitHub repo URLs (user will add later), LinkedIn profile, downloadable resume PDF.
 
 ## Product Principles
