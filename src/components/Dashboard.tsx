@@ -1,9 +1,9 @@
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const aboutParagraphs = [
-  "I'm a 4th-year BS Information Technology student at Camiguin Polytechnic State College who enjoys building reliable software for the web. I got into full-stack development because I like turning practical requirements into working systems people can use every day.",
+  "I'm a 4th-year BS Information Technology student at Camiguin Polytechnic State College and a developer for Internix IT Solutions — Camiguin's first DICT-incubated startup, where we build practical digital systems for local government units (LGUs) and MSMEs.",
   'I learn by shipping. Most of what I know comes from building real systems: an IoT-backed barangay health monitoring platform, a campus outpatient clinic manager, a municipal payroll platform, a voting system, an online storefront for a local bakeshop, and an interactive Camiguin tourism map.',
-  "Right now I'm finishing my degree and actively seeking an OJT / internship where I can contribute to an engineering team, learn strong production habits, and keep growing.",
+  "Right now I'm finishing my degree and actively seeking an OJT / internship where I can contribute to an engineering team, strengthen my production habits, and keep growing.",
 ]
 
 const stackGroups = [
@@ -27,9 +27,19 @@ const stackGroups = [
 
 const competitionHighlights = [
   {
+    rank: 'Awarded',
+    name: 'Outstanding Youth Innovators Award — Internix',
+    meta: 'DICT Camiguin Provincial Officer Recognition · Pioneering Tech Startup of Camiguin',
+  },
+  {
     rank: '1st / 9',
     name: 'Annual Reverse Pitching — Champion',
     meta: 'CTRL+Ventures · Winning pitch: eGABAY Digital Health & Social Welfare System',
+  },
+  {
+    rank: '3 Days',
+    name: '2026 RSTW — Startup Exhibitor (Internix IT Solutions)',
+    meta: 'DICT-Incubated Startup · Shared Booth with DICT Camiguin · DOST Plaque of Appreciation',
   },
   {
     rank: 'Top 20',
@@ -102,8 +112,16 @@ export function AboutSection() {
 
           <div data-rv>
             <div className="profile-block">
-              <h3 className="sub-heading">Education &amp; Milestones</h3>
+              <h3 className="sub-heading">Experience, Education &amp; Milestones</h3>
               <div className="timeline-list">
+                <div className="timeline-row">
+                  <div>
+                    <h4>Developer — Internix IT Solutions</h4>
+                    <p>First startup in Camiguin, incubated by DICT · Developing web systems for local government units (LGUs) and MSMEs</p>
+                  </div>
+                  <span className="badge-accent">Startup</span>
+                </div>
+
                 <div className="timeline-row">
                   <div>
                     <h4>Smart Barangay Health Monitoring Kiosk</h4>

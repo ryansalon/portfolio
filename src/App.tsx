@@ -84,7 +84,7 @@ function App() {
     document.title =
       page === 'achievements'
         ? 'Competitions & Achievements | Ryan Marc L. Salon'
-        : 'Ryan Marc L. Salon | Full-Stack Web Developer'
+        : 'Ryan Marc L. Salon | Web Developer'
 
     if (page === 'home') {
       startActiveSectionTracking(ALL_SECTION_IDS)
