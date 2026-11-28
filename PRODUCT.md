@@ -8,7 +8,7 @@ web
 
 ## Users
 
-- **Primary (inferred from bio and OJT goals):** OJT / internship supervisors, technical leads, and hiring managers evaluating Ryan's full-stack web engineering ability, real-world shipping record, and readiness to join a team.
+- **Primary (inferred from bio and OJT goals):** OJT / internship supervisors, technical leads, and hiring managers evaluating Ryan's web engineering ability, real-world shipping record, and readiness to join a team.
 - **Secondary:** Local businesses, municipal offices (LGUs), and campus organizations in Camiguin and Region 10 reviewing Ryan's shipped systems and competition record.
 
 ## Product Purpose
@@ -25,7 +25,7 @@ Visitors scan the portfolio on laptops and mobile phones during workdays or even
 
 ## Capabilities and Constraints
 
-- React 18 + Vite + TypeScript + Tailwind CSS + GSAP + Lenis single-page application with hash-based routing (`#` home + `#/achievements` dedicated Competitions & Achievements page).
+- React 18 + Vite + TypeScript + Tailwind CSS + GSAP + Lenis single-page application with hash-based routing (`#` home + `#/why-me` dedicated Why Me page + `#/achievements` dedicated Competitions & Achievements page).
 - Must support both an **eye-friendly, low-glare default theme** and a clean theme toggle (light & dark both soft and restful, never harsh `#000000` / `#ffffff` glare).
 - External live demo and GitHub repository URLs for individual projects are intentionally left optional (`liveUrl?`, `repoUrl?`) for Ryan to add later; projects must still be meaningfully inspectable via clean screenshot previews and descriptions.
 - Preserve all factual claims strictly — never invent awards, clients, testimonials, or links.
@@ -45,7 +45,7 @@ Visitors scan the portfolio on laptops and mobile phones during workdays or even
   2. ClinicSync — Outpatient Clinic (`public/assets/clinicsync.jpg`) — CPSC outpatient clinic queue, consultations & EMR system.
   3. Payroll Management System (`public/assets/payroll-management.jpg`) — LGU-Mahinog CodeIgniter/PHP/MySQL payroll platform.
   4. Camiguin Tourism (`public/assets/camiguin-tourism.webp`) — Next.js + Leaflet interactive island map guide.
-  5. Pacudan Bakeshop (`public/assets/pacudan-bakeshop.webp`) — Local e-commerce storefront.
+  5. Pacudan Bakeshop (`public/assets/pacudan-bakeshop.jpg`) — Local e-commerce storefront.
   6. Voting System (`public/assets/voting-system.webp`) — PHP + MySQL ballot casting & tallying system.
 - **6 Verified Competitions, Exhibitions & Awards:**
   1. Outstanding Youth Innovators Award — Presented to Internix by DICT Camiguin Provincial Officer Engr. James Kevin M. Sagocsoc (June 25, 2026 at CPSC; `public/assets/awards/outstanding-youth-innovators.jpg`).
