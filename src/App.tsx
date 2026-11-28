@@ -3,31 +3,47 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { usePrefersReducedMotion } from './hooks/useReducedMotion'
-import { scrollToSection, setLenis, startActiveSectionTracking } from './lib/scroll'
+import { trapFocusOnTab } from './lib/focusTrap'
+import {
+  pauseScroll,
+  resumeScroll,
+  scrollToSection,
+  setLenis,
+  startActiveSectionTracking,
+} from './lib/scroll'
 import { ThemeProvider } from './theme'
 import type { ProjectItem } from './data/projects'
-import Nav from './components/Nav'
+import Nav, { type AppPage } from './components/Nav'
 import Hero from './components/Hero'
 import Projects from './components/Projects'
 import { AboutSection, AchievementsTeaser } from './components/Dashboard'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import AchievementsPage from './components/AchievementsPage'
+import WhyMePage from './components/WhyMePage'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const NAV_SECTIONS = [
   { id: 'about', label: 'About' },
   { id: 'work', label: 'Projects' },
-  { id: 'contact', label: 'Contact' },
 ]
 
-const ALL_SECTION_IDS = ['hero', 'about', 'work', 'contact']
+const ALL_SECTION_IDS = ['hero', 'about', 'work', 'achievements', 'contact']
 
-type Page = 'home' | 'achievements'
+function readPageFromHash(): AppPage {
+  const hash = window.location.hash
+  if (hash === '#/achievements' || hash.startsWith('#/achievements/')) return 'achievements'
+  if (hash === '#/why-me') return 'why-me'
+  return 'home'
+}
 
-function readPageFromHash(): Page {
-  return window.location.hash === '#/achievements' ? 'achievements' : 'home'
+function readAchievementTargetFromHash(): string | null {
+  const hash = window.location.hash
+  if (hash.startsWith('#/achievements/')) {
+    return hash.slice('#/achievements/'.length) || null
+  }
+  return null
 }
 
 function CloseIcon() {
@@ -64,18 +80,42 @@ function ArrowUpRightIcon() {
 
 function App() {
   const reducedMotion = usePrefersReducedMotion()
-  const [page, setPage] = useState<Page>(readPageFromHash)
+  const [page, setPage] = useState<AppPage>(readPageFromHash)
+  const [achievementTarget, setAchievementTarget] = useState<string | null>(
+    readAchievementTargetFromHash
+  )
   const [inspected, setInspected] = useState<{ project: ProjectItem; mediaIndex: number } | null>(
     null
   )
   const modalCloseRef = useRef<HTMLButtonElement>(null)
+  const modalDialogRef = useRef<HTMLDivElement>(null)
+  const lastTriggerRef = useRef<HTMLElement | null>(null)
+  const isModalOpen = Boolean(inspected)
 
-  const openProjectModal = useCallback((project: ProjectItem, startIndex: number = 0) => {
-    setInspected({ project, mediaIndex: startIndex })
+  const openProjectModal = useCallback(
+    (project: ProjectItem, startIndex: number = 0, trigger?: HTMLElement | null) => {
+      lastTriggerRef.current = trigger ?? (document.activeElement as HTMLElement | null)
+      setInspected({ project, mediaIndex: startIndex })
+    },
+    []
+  )
+
+  const closeProjectModal = useCallback(() => {
+    setInspected(null)
   }, [])
 
   useEffect(() => {
-    const onHashChange = () => setPage(readPageFromHash())
+    const onHashChange = () => {
+      const nextPage = readPageFromHash()
+      if (
+        nextPage === 'home' &&
+        window.location.hash.startsWith('#/')
+      ) {
+        window.history.replaceState(null, '', '#')
+      }
+      setPage(nextPage)
+      setAchievementTarget(readAchievementTargetFromHash())
+    }
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
@@ -84,43 +124,65 @@ function App() {
     document.title =
       page === 'achievements'
         ? 'Competitions & Achievements | Ryan Marc L. Salon'
-        : 'Ryan Marc L. Salon | Web Developer'
+        : page === 'why-me'
+          ? 'Why Work With Me | Ryan Marc L. Salon'
+          : 'Ryan Marc L. Salon | Web Developer'
 
     if (page === 'home') {
       startActiveSectionTracking(ALL_SECTION_IDS)
       ScrollTrigger.refresh()
-    } else {
+    } else if (!achievementTarget) {
       window.scrollTo(0, 0)
     }
-  }, [page])
+  }, [page, achievementTarget])
 
   useEffect(() => {
-    document.body.classList.toggle('modal-open', Boolean(inspected))
-    if (!inspected) return
+    if (!isModalOpen) {
+      if (lastTriggerRef.current) {
+        lastTriggerRef.current.focus()
+        lastTriggerRef.current = null
+      }
+      return
+    }
 
+    document.body.classList.add('modal-open')
+    pauseScroll()
     modalCloseRef.current?.focus()
-    const total = inspected.project.gallery?.length ?? 1
+
+    return () => {
+      document.body.classList.remove('modal-open')
+      resumeScroll()
+    }
+  }, [isModalOpen])
+
+  useEffect(() => {
+    if (!isModalOpen) return
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setInspected(null)
-      } else if (total > 1 && e.key === 'ArrowLeft') {
-        setInspected((prev) =>
-          prev ? { ...prev, mediaIndex: (prev.mediaIndex - 1 + total) % total } : null
-        )
-      } else if (total > 1 && e.key === 'ArrowRight') {
-        setInspected((prev) =>
-          prev ? { ...prev, mediaIndex: (prev.mediaIndex + 1) % total } : null
-        )
+        closeProjectModal()
+      } else if (e.key === 'ArrowLeft') {
+        setInspected((prev) => {
+          if (!prev) return null
+          const total = prev.project.gallery?.length ?? 1
+          if (total <= 1) return prev
+          return { ...prev, mediaIndex: (prev.mediaIndex - 1 + total) % total }
+        })
+      } else if (e.key === 'ArrowRight') {
+        setInspected((prev) => {
+          if (!prev) return null
+          const total = prev.project.gallery?.length ?? 1
+          if (total <= 1) return prev
+          return { ...prev, mediaIndex: (prev.mediaIndex + 1) % total }
+        })
+      } else {
+        trapFocusOnTab(e, modalDialogRef.current)
       }
     }
 
     document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      document.body.classList.remove('modal-open')
-    }
-  }, [inspected])
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [isModalOpen, closeProjectModal])
 
   useEffect(() => {
     if (reducedMotion) {
@@ -159,16 +221,28 @@ function App() {
     }
   }, [reducedMotion])
 
-  const navigateAchievements = useCallback(() => {
-    if (window.location.hash !== '#/achievements') {
-      window.location.hash = '#/achievements'
+  const navigateAchievements = useCallback((targetId?: string) => {
+    const nextHash = targetId ? `#/achievements/${targetId}` : '#/achievements'
+    if (window.location.hash !== nextHash) {
+      window.location.hash = nextHash
     }
+    setAchievementTarget(targetId ?? null)
     setPage('achievements')
+    if (!targetId) window.scrollTo(0, 0)
+  }, [])
+
+  const navigateWhyMe = useCallback(() => {
+    if (window.location.hash !== '#/why-me') {
+      window.location.hash = '#/why-me'
+    }
+    setAchievementTarget(null)
+    setPage('why-me')
     window.scrollTo(0, 0)
   }, [])
 
   const navigateHomeSection = useCallback(
     (id: string) => {
+      setAchievementTarget(null)
       if (page !== 'home') {
         window.history.pushState(null, '', id === 'hero' ? '#' : `#${id}`)
         setPage('home')
@@ -179,11 +253,16 @@ function App() {
           })
         })
       } else {
-        scrollToSection(document.getElementById(id))
+        if (id === 'hero') window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' })
+        else scrollToSection(document.getElementById(id))
       }
     },
-    [page]
+    [page, reducedMotion]
   )
+
+  const clearAchievementTarget = useCallback(() => {
+    setAchievementTarget(null)
+  }, [])
 
   const modalMediaList = inspected
     ? inspected.project.gallery ?? [
@@ -199,7 +278,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <a href={page === 'home' ? '#about' : '#main-content'} className="skip-link">
+      <a href="#main-content" className="skip-link">
         Skip to content
       </a>
 
@@ -208,16 +287,27 @@ function App() {
         allSectionIds={ALL_SECTION_IDS}
         currentPage={page}
         onNavigateHomeSection={navigateHomeSection}
-        onNavigateAchievements={navigateAchievements}
+        onNavigateWhyMe={navigateWhyMe}
+        onNavigateAchievements={() => navigateAchievements()}
       />
 
       <main id="main-content">
         {page === 'achievements' ? (
-          <AchievementsPage onBackHome={() => navigateHomeSection('hero')} />
+          <AchievementsPage
+            onBackHome={() => navigateHomeSection('hero')}
+            targetId={achievementTarget}
+            onTargetConsumed={clearAchievementTarget}
+          />
+        ) : page === 'why-me' ? (
+          <WhyMePage
+            onBackHome={() => navigateHomeSection('hero')}
+            onViewProjects={() => navigateHomeSection('work')}
+            onViewAchievements={() => navigateAchievements()}
+          />
         ) : (
           <>
             <Hero />
-            <AboutSection />
+            <AboutSection onOpenWhyMe={navigateWhyMe} />
             <Projects onInspectProject={openProjectModal} />
             <AchievementsTeaser onOpenAchievements={navigateAchievements} />
             <Contact />
@@ -234,17 +324,17 @@ function App() {
           aria-modal="true"
           aria-labelledby="project-modal-title"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setInspected(null)
+            if (e.target === e.currentTarget) closeProjectModal()
           }}
         >
-          <div className="modal-dialog">
+          <div ref={modalDialogRef} className="modal-dialog">
             <div className="modal-head">
               <div>
                 <h3 id="project-modal-title" className="display h-md">
                   {inspected.project.title}
                 </h3>
                 <span className="mono-meta">
-                  {inspected.project.categoryLabel}
+                  {inspected.project.categoryLabel} &middot; {inspected.project.role}
                   {modalMediaList.length > 1
                     ? ` · ${inspected.mediaIndex + 1} / ${modalMediaList.length}`
                     : ''}
@@ -254,7 +344,7 @@ function App() {
                 ref={modalCloseRef}
                 type="button"
                 className="modal-close"
-                onClick={() => setInspected(null)}
+                onClick={closeProjectModal}
                 aria-label="Close project preview"
               >
                 <CloseIcon />
@@ -286,7 +376,7 @@ function App() {
                     }
                   >
                     <ChevronLeftIcon />
-                    Prev
+                    Previous
                   </button>
                   <button
                     type="button"
@@ -325,9 +415,17 @@ function App() {
               </div>
             )}
 
-            <p className="work-desc" style={{ marginBottom: '16px' }}>
+            <p className="work-desc" style={{ marginBottom: '14px' }}>
               {inspected.project.description}
             </p>
+
+            {inspected.project.highlights.length > 0 && (
+              <ul className="modal-highlights">
+                {inspected.project.highlights.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            )}
 
             <div className="tag-row">
               {inspected.project.tags.map((tag) => (
@@ -337,7 +435,7 @@ function App() {
               ))}
             </div>
 
-            {(inspected.project.liveUrl || inspected.project.repoUrl) && (
+            {inspected.project.liveUrl || inspected.project.repoUrl ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px' }}>
                 {inspected.project.liveUrl && (
                   <a
@@ -362,6 +460,8 @@ function App() {
                   </a>
                 )}
               </div>
+            ) : (
+              <p className="modal-deployment-note">{inspected.project.deploymentNote}</p>
             )}
           </div>
         </div>
