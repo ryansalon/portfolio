@@ -1,4 +1,5 @@
-import { scrollToSection } from '../lib/scroll'
+import { usePrefersReducedMotion } from '../hooks/useReducedMotion'
+import { scrollToTop } from '../lib/scroll'
 
 function ArrowUpIcon() {
   return (
@@ -9,6 +10,8 @@ function ArrowUpIcon() {
 }
 
 export default function Footer() {
+  const reducedMotion = usePrefersReducedMotion()
+
   return (
     <footer className="foot">
       <div className="container">
@@ -19,11 +22,7 @@ export default function Footer() {
           <button
             type="button"
             className="foot-top"
-            onClick={() => {
-              const hero = document.getElementById('hero')
-              if (hero) scrollToSection(hero)
-              else window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
+            onClick={() => scrollToTop(reducedMotion)}
           >
             Back to top
             <ArrowUpIcon />

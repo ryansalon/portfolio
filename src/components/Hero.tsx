@@ -69,7 +69,7 @@ export default function Hero() {
             <p className="hero-role hero-rv">Web Developer &middot; Internix IT Solutions</p>
 
             <p className="hero-lead hero-rv">
-              4th-year BS Information Technology student at Camiguin Polytechnic State College and developer for Internix IT Solutions — Camiguin&apos;s first DICT-incubated startup building web systems for LGUs and MSMEs — backed by a defended IoT + web capstone.
+              4th-year BSIT student building practical web systems for municipal offices, campus healthcare, and local businesses in Camiguin — backed by a defended IoT health monitoring kiosk.
             </p>
 
             <div className="hero-meta-row hero-rv">
@@ -104,7 +104,7 @@ export default function Hero() {
                 src="/assets/pfp.jpg"
                 alt="Portrait of Ryan Marc L. Salon"
                 width={286}
-                height={314}
+                height={381}
                 fetchPriority="high"
                 decoding="async"
               />

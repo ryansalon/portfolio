@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { subscribeActiveSection } from '../lib/scroll'
+import { getFocusableElements, trapFocusOnTab } from '../lib/focusTrap'
+import { pauseScroll, resumeScroll, subscribeActiveSection } from '../lib/scroll'
 import { useTheme } from '../theme'
 import ThemeIcon from './ThemeIcon'
 
@@ -8,11 +9,14 @@ export interface NavSection {
   label: string
 }
 
+export type AppPage = 'home' | 'why-me' | 'achievements'
+
 interface NavProps {
   sections: NavSection[]
   allSectionIds: string[]
-  currentPage: 'home' | 'achievements'
+  currentPage: AppPage
   onNavigateHomeSection: (id: string) => void
+  onNavigateWhyMe: () => void
   onNavigateAchievements: () => void
 }
 
@@ -21,9 +25,12 @@ export default function Nav({
   allSectionIds,
   currentPage,
   onNavigateHomeSection,
+  onNavigateWhyMe,
   onNavigateAchievements,
 }: NavProps) {
   const burgerRef = useRef<HTMLButtonElement>(null)
+  const drawerRef = useRef<HTMLElement>(null)
+  const wasOpenRef = useRef(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeId, setActiveId] = useState(allSectionIds[0] ?? 'hero')
   const { theme, toggleTheme } = useTheme()
@@ -35,30 +42,52 @@ export default function Nav({
   }, [allSectionIds])
 
   useEffect(() => {
-    document.body.classList.toggle('nav-open', menuOpen)
-    return () => document.body.classList.remove('nav-open')
-  }, [menuOpen])
+    if (menuOpen) {
+      wasOpenRef.current = true
+      document.body.classList.add('nav-open')
+      pauseScroll()
+      const focusables = getFocusableElements(drawerRef.current)
+      focusables[0]?.focus()
 
-  useEffect(() => {
-    if (!menuOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setMenuOpen(false)
-        burgerRef.current?.focus()
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMenuOpen(false)
+          return
+        }
+        trapFocusOnTab(e, drawerRef.current)
+      }
+
+      document.addEventListener('keydown', onKeyDown)
+      return () => {
+        document.removeEventListener('keydown', onKeyDown)
+        document.body.classList.remove('nav-open')
+        resumeScroll()
       }
     }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false
+      burgerRef.current?.focus()
+    }
   }, [menuOpen])
 
   const handleSectionClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
+    wasOpenRef.current = false
     setMenuOpen(false)
     onNavigateHomeSection(id)
   }
 
+  const handleWhyMeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    wasOpenRef.current = false
+    setMenuOpen(false)
+    onNavigateWhyMe()
+  }
+
   const handleAchievementsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
+    wasOpenRef.current = false
     setMenuOpen(false)
     onNavigateAchievements()
   }
@@ -93,6 +122,15 @@ export default function Nav({
                 </a>
               )
             })}
+
+            <a
+              className={`nav-item${currentPage === 'why-me' ? ' on' : ''}`}
+              href="#/why-me"
+              aria-current={currentPage === 'why-me' ? 'page' : undefined}
+              onClick={handleWhyMeClick}
+            >
+              Why Me
+            </a>
 
             <a
               className={`nav-item${currentPage === 'achievements' ? ' on' : ''}`}
@@ -146,6 +184,7 @@ export default function Nav({
       />
 
       <nav
+        ref={drawerRef}
         id="mobile-drawer"
         className={`mobile-drawer${menuOpen ? ' open' : ''}`}
         aria-label="Mobile"
@@ -166,6 +205,16 @@ export default function Nav({
             </a>
           )
         })}
+
+        <a
+          className={`nav-item${currentPage === 'why-me' ? ' on' : ''}`}
+          href="#/why-me"
+          tabIndex={menuOpen ? 0 : -1}
+          aria-current={currentPage === 'why-me' ? 'page' : undefined}
+          onClick={handleWhyMeClick}
+        >
+          Why Me
+        </a>
 
         <a
           className={`nav-item${currentPage === 'achievements' ? ' on' : ''}`}

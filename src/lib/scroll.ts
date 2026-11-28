@@ -1,17 +1,41 @@
 import type Lenis from 'lenis'
 
 let instance: Lenis | null = null
+let lockCount = 0
 
 export function setLenis(l: Lenis | null) {
   instance = l
+  if (instance && lockCount > 0) {
+    instance.stop()
+  }
 }
 
-export function scrollToSection(el: HTMLElement | null) {
+export function pauseScroll() {
+  lockCount += 1
+  instance?.stop()
+}
+
+export function resumeScroll() {
+  lockCount = Math.max(0, lockCount - 1)
+  if (lockCount === 0) {
+    instance?.start()
+  }
+}
+
+export function scrollToSection(el: HTMLElement | null, offset = -80) {
   if (!el) return
   if (instance) {
-    instance.scrollTo(el, { offset: -80 })
+    instance.scrollTo(el, { offset })
   } else {
     el.scrollIntoView({ block: 'start' })
+  }
+}
+
+export function scrollToTop(reducedMotion: boolean) {
+  if (instance && !reducedMotion) {
+    instance.scrollTo(0)
+  } else {
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' })
   }
 }
 
@@ -24,19 +48,25 @@ let listening = false
 const listeners = new Set<ActiveListener>()
 
 function measureActive(): number {
-  const vh = window.innerHeight
-  let closest = 0
-  let minDist = Infinity
+  if (!sections.length) return 0
+
+  const scrollBottom = window.scrollY + window.innerHeight
+  const docHeight = document.documentElement.scrollHeight
+  if (docHeight - scrollBottom <= 24) {
+    return sections.length - 1
+  }
+
+  const threshold = Math.min(180, window.innerHeight * 0.28)
+  let current = 0
   for (let i = 0; i < sections.length; i++) {
     const rect = sections[i].getBoundingClientRect()
-    const center = rect.top + rect.height / 2
-    const dist = Math.abs(center - vh / 2)
-    if (dist < minDist) {
-      minDist = dist
-      closest = i
+    if (rect.top <= threshold) {
+      current = i
+    } else {
+      break
     }
   }
-  return closest
+  return current
 }
 
 function flush() {

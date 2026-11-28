@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { projects, type ProjectCategory, type ProjectItem } from '../data/projects'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 interface ProjectsProps {
-  onInspectProject: (project: ProjectItem, startIndex?: number) => void
+  onInspectProject: (
+    project: ProjectItem,
+    startIndex?: number,
+    trigger?: HTMLElement | null
+  ) => void
 }
+
+type FilterKey = 'all' | ProjectCategory
+
+const FILTER_ORDER: FilterKey[] = ['all', 'civic', 'web']
 
 function ExpandIcon() {
   return (
@@ -24,12 +32,37 @@ function ArrowUpRightIcon() {
 
 export default function Projects({ onInspectProject }: ProjectsProps) {
   const sectionRef = useScrollReveal('[data-rv]', { y: 22, stagger: 0.08 })
-  const [filter, setFilter] = useState<'all' | ProjectCategory>('all')
+  const [filter, setFilter] = useState<FilterKey>('all')
+  const tabRefs = useRef<Record<FilterKey, HTMLButtonElement | null>>({
+    all: null,
+    civic: null,
+    web: null,
+  })
 
   const civicCount = projects.filter((p) => p.category === 'civic').length
   const webCount = projects.filter((p) => p.category === 'web').length
   const visibleProjects =
     filter === 'all' ? projects : projects.filter((p) => p.category === filter)
+
+  const regularProjects = visibleProjects.filter((p) => !(p.featured && p.gallery?.length))
+  const trailingOddId =
+    regularProjects.length % 2 === 1 ? regularProjects[regularProjects.length - 1]?.id : null
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, current: FilterKey) => {
+    const idx = FILTER_ORDER.indexOf(current)
+    let nextIdx: number | null = null
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % FILTER_ORDER.length
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + FILTER_ORDER.length) % FILTER_ORDER.length
+    else if (e.key === 'Home') nextIdx = 0
+    else if (e.key === 'End') nextIdx = FILTER_ORDER.length - 1
+
+    if (nextIdx !== null) {
+      e.preventDefault()
+      const nextKey = FILTER_ORDER[nextIdx]
+      setFilter(nextKey)
+      tabRefs.current[nextKey]?.focus()
+    }
+  }
 
   return (
     <section ref={sectionRef} id="work" className="sec">
@@ -44,36 +77,62 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
 
           <div className="filter-tabs" role="tablist" aria-label="Filter projects">
             <button
+              ref={(el) => {
+                tabRefs.current.all = el
+              }}
+              id="tab-all"
               type="button"
               role="tab"
               aria-selected={filter === 'all'}
+              aria-controls="projects-panel"
+              tabIndex={filter === 'all' ? 0 : -1}
               className={`filter-tab${filter === 'all' ? ' active' : ''}`}
               onClick={() => setFilter('all')}
+              onKeyDown={(e) => handleTabKeyDown(e, 'all')}
             >
               All ({projects.length})
             </button>
             <button
+              ref={(el) => {
+                tabRefs.current.civic = el
+              }}
+              id="tab-civic"
               type="button"
               role="tab"
               aria-selected={filter === 'civic'}
+              aria-controls="projects-panel"
+              tabIndex={filter === 'civic' ? 0 : -1}
               className={`filter-tab${filter === 'civic' ? ' active' : ''}`}
               onClick={() => setFilter('civic')}
+              onKeyDown={(e) => handleTabKeyDown(e, 'civic')}
             >
               Civic &amp; Health ({civicCount})
             </button>
             <button
+              ref={(el) => {
+                tabRefs.current.web = el
+              }}
+              id="tab-web"
               type="button"
               role="tab"
               aria-selected={filter === 'web'}
+              aria-controls="projects-panel"
+              tabIndex={filter === 'web' ? 0 : -1}
               className={`filter-tab${filter === 'web' ? ' active' : ''}`}
               onClick={() => setFilter('web')}
+              onKeyDown={(e) => handleTabKeyDown(e, 'web')}
             >
               Web &amp; Commerce ({webCount})
             </button>
           </div>
         </div>
 
-        <div className="work-grid">
+        <div
+          id="projects-panel"
+          role="tabpanel"
+          aria-labelledby={`tab-${filter}`}
+          className="work-grid"
+        >
           {visibleProjects.map((project) => {
             const isFeatured = Boolean(project.featured && project.gallery?.length)
 
@@ -85,7 +144,7 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
                       <button
                         type="button"
                         className="work-media-btn"
-                        onClick={() => onInspectProject(project, 0)}
+                        onClick={(e) => onInspectProject(project, 0, e.currentTarget)}
                         aria-label={`Open full preview of ${project.title}`}
                       >
                         <img src={project.image} alt={project.alt} loading="lazy" />
@@ -98,11 +157,11 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
                           key={media.src}
                           type="button"
                           className="prototype-thumb-btn"
-                          onClick={() => onInspectProject(project, idx + 1)}
+                          onClick={(e) => onInspectProject(project, idx + 1, e.currentTarget)}
                           aria-label={`Inspect ${media.caption}`}
                         >
                           <img src={media.src} alt={media.alt} loading="lazy" />
-                          <span>{idx === 2 ? 'Blueprint' : `Prototype ${idx + 1}`}</span>
+                          <span>{media.thumbLabel ?? `View ${idx + 2}`}</span>
                         </button>
                       ))}
                     </div>
@@ -131,7 +190,7 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
                       <button
                         type="button"
                         className="btn-primary"
-                        onClick={() => onInspectProject(project, 0)}
+                        onClick={(e) => onInspectProject(project, 0, e.currentTarget)}
                       >
                         Inspect Web &amp; Prototype ({project.gallery.length})
                         <ExpandIcon />
@@ -166,14 +225,20 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
               )
             }
 
+            const isWide = project.id === trailingOddId
+
             return (
-              <article key={project.id} className="work-card" data-rv>
+              <article
+                key={project.id}
+                className={`work-card${isWide ? ' is-wide' : ''}`}
+                data-rv
+              >
                 <div className="work-media-frame">
                   <button
                     type="button"
                     className="work-media-btn"
-                    onClick={() => onInspectProject(project, 0)}
-                    aria-label={`Open full preview of ${project.title}`}
+                    onClick={(e) => onInspectProject(project, 0, e.currentTarget)}
+                    aria-label={`Open details for ${project.title}`}
                   >
                     <img src={project.image} alt={project.alt} loading="lazy" />
                   </button>
@@ -199,9 +264,9 @@ export default function Projects({ onInspectProject }: ProjectsProps) {
                     <button
                       type="button"
                       className="work-action-btn"
-                      onClick={() => onInspectProject(project, 0)}
+                      onClick={(e) => onInspectProject(project, 0, e.currentTarget)}
                     >
-                      Inspect Preview
+                      Inspect Details
                       <ExpandIcon />
                     </button>
 

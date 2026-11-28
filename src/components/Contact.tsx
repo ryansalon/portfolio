@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 
 const EMAIL = 'ryanmarcsalon04@gmail.com'
@@ -30,15 +30,27 @@ function CheckIcon() {
 
 export default function Contact() {
   const sectionRef = useScrollReveal('[data-rv]', { y: 20, stagger: 0.08 })
-  const [copied, setCopied] = useState(false)
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle')
+  const timerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current)
+    }
+  }, [])
 
   const handleCopy = async () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
     try {
       await navigator.clipboard.writeText(EMAIL)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 2400)
+      setCopyState('copied')
+      timerRef.current = window.setTimeout(() => setCopyState('idle'), 2400)
     } catch {
-      /* clipboard permission unavailable */
+      setCopyState('error')
+      timerRef.current = window.setTimeout(() => setCopyState('idle'), 4500)
     }
   }
 
@@ -49,7 +61,7 @@ export default function Contact() {
           <div>
             <h2 className="display h-sec">Let&apos;s Talk</h2>
             <p className="contact-lead">
-              I&apos;m finishing my 4th year of BSIT at Camiguin Polytechnic State College and actively looking for an OJT / internship where I can contribute and keep building useful software.
+              I&apos;m finishing my 4th year of BSIT at Camiguin Polytechnic State College and actively looking for an OJT / internship placement — and I&apos;m also open to collaborating with local businesses, offices, and student teams on practical web projects.
             </p>
 
             <div className="contact-actions">
@@ -57,13 +69,18 @@ export default function Contact() {
                 Send an Email
               </a>
               <button type="button" className="btn-secondary" onClick={handleCopy}>
-                {copied ? <CheckIcon /> : <CopyIcon />}
-                <span>{copied ? 'Email Copied' : 'Copy Email'}</span>
+                {copyState === 'copied' ? <CheckIcon /> : <CopyIcon />}
+                <span>{copyState === 'copied' ? 'Email Copied' : 'Copy Email'}</span>
               </button>
-              <span className="sr-only" aria-live="polite">
-                {copied ? 'Email address copied to clipboard.' : ''}
-              </span>
             </div>
+
+            <p className="copy-feedback" role="status" aria-live="polite">
+              {copyState === 'copied'
+                ? `Copied ${EMAIL} to your clipboard.`
+                : copyState === 'error'
+                  ? `Clipboard access was blocked — you can reach me directly at ${EMAIL}.`
+                  : ''}
+            </p>
           </div>
 
           <div className="channel-list">

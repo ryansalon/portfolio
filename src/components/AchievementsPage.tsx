@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { trapFocusOnTab } from '../lib/focusTrap'
+import { pauseScroll, resumeScroll, scrollToSection } from '../lib/scroll'
 
 interface CompetitionPhoto {
   src: string
@@ -15,7 +17,6 @@ interface Competition {
   score: string
   summary: string
   highlights: { value: string; label: string }[]
-  tags: string[]
   photos: CompetitionPhoto[]
 }
 
@@ -35,7 +36,6 @@ const competitions: Competition[] = [
       { value: 'DICT Camiguin', label: 'Provincial Officer Recognition' },
       { value: 'June 2026', label: 'Awarded at CPSC, Mambajao' },
     ],
-    tags: ['Outstanding Youth Innovators', 'Internix IT Solutions', 'DICT Camiguin', 'Youth-Led Innovation'],
     photos: [
       {
         src: '/assets/awards/outstanding-youth-innovators.jpg',
@@ -58,7 +58,6 @@ const competitions: Competition[] = [
       { value: 'eGABAY', label: 'Winning Pitch Concept' },
       { value: 'Awarded', label: 'Winning Certificate' },
     ],
-    tags: ['1st Place Winner', 'Reverse Pitching', 'eGABAY', 'CTRL+Ventures'],
     photos: [
       {
         src: '/assets/reverse-pitching/pitch.jpg',
@@ -106,7 +105,6 @@ const competitions: Competition[] = [
       { value: 'DICT Partner', label: 'Shared Booth in Camiguin' },
       { value: 'Plaque', label: 'DOST Appreciation Award' },
     ],
-    tags: ['Internix IT Solutions', 'DICT Incubated', '2026 RSTW', 'DOST', 'LGU & MSME Systems'],
     photos: [
       {
         src: '/assets/rstw/booth-plaque.jpg',
@@ -144,7 +142,6 @@ const competitions: Competition[] = [
       { value: 'PSC XI', label: 'DICT & Startup PH' },
       { value: 'Awarded', label: 'Certificate of Participation' },
     ],
-    tags: ['Top 20 Finalist', 'Startup Pitching', 'PSC XI', 'DICT Region 10'],
     photos: [
       {
         src: '/assets/psc-xi/stage-awarding.jpg',
@@ -182,7 +179,6 @@ const competitions: Competition[] = [
       { value: '6th / 12', label: 'Final Team Rank' },
       { value: 'Awarded', label: 'Certificate of Participation' },
     ],
-    tags: ['Cybersecurity', 'Capture the Flag', 'DICT', 'Team Phish & Chips'],
     photos: [
       {
         src: '/assets/hack4gov/awarding.jpg',
@@ -225,7 +221,6 @@ const competitions: Competition[] = [
       { value: 'DICT & DTI', label: 'Partner Agencies' },
       { value: 'Awarded', label: 'Certificate of Appreciation' },
     ],
-    tags: ['Digital Transformation', 'MSME Pitch', 'DICT Region 10', 'DTI'],
     photos: [
       {
         src: '/assets/tech-tuesday/certificate.jpg',
@@ -243,6 +238,8 @@ const competitions: Competition[] = [
 
 interface AchievementsPageProps {
   onBackHome: () => void
+  targetId?: string | null
+  onTargetConsumed?: () => void
 }
 
 function ArrowLeftIcon() {
@@ -277,47 +274,80 @@ function CloseIcon() {
   )
 }
 
-export default function AchievementsPage({ onBackHome }: AchievementsPageProps) {
+export default function AchievementsPage({
+  onBackHome,
+  targetId,
+  onTargetConsumed,
+}: AchievementsPageProps) {
   const [lightbox, setLightbox] = useState<{ photos: CompetitionPhoto[]; index: number } | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const isLightboxOpen = Boolean(lightbox)
 
   useEffect(() => {
-    document.body.classList.toggle('modal-open', Boolean(lightbox))
-    if (!lightbox) return
+    if (!targetId) return
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(targetId)
+      if (el) scrollToSection(el, -88)
+      onTargetConsumed?.()
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [targetId, onTargetConsumed])
 
+  const closeLightbox = useCallback(() => {
+    setLightbox(null)
+  }, [])
+
+  useEffect(() => {
+    if (!isLightboxOpen) {
+      if (lastTriggerRef.current) {
+        lastTriggerRef.current.focus()
+        lastTriggerRef.current = null
+      }
+      return
+    }
+
+    document.body.classList.add('modal-open')
+    pauseScroll()
     closeBtnRef.current?.focus()
+
+    return () => {
+      document.body.classList.remove('modal-open')
+      resumeScroll()
+    }
+  }, [isLightboxOpen])
+
+  useEffect(() => {
+    if (!isLightboxOpen) return
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setLightbox(null)
-        lastTriggerRef.current?.focus()
+        closeLightbox()
       } else if (e.key === 'ArrowLeft') {
         setLightbox((prev) =>
-          prev ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length } : null
+          prev && prev.photos.length > 1
+            ? { ...prev, index: (prev.index - 1 + prev.photos.length) % prev.photos.length }
+            : prev
         )
       } else if (e.key === 'ArrowRight') {
         setLightbox((prev) =>
-          prev ? { ...prev, index: (prev.index + 1) % prev.photos.length } : null
+          prev && prev.photos.length > 1
+            ? { ...prev, index: (prev.index + 1) % prev.photos.length }
+            : prev
         )
+      } else {
+        trapFocusOnTab(e, dialogRef.current)
       }
     }
 
     document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-      document.body.classList.remove('modal-open')
-    }
-  }, [lightbox])
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [isLightboxOpen, closeLightbox])
 
   const openPhoto = (photos: CompetitionPhoto[], index: number, trigger: HTMLButtonElement) => {
     lastTriggerRef.current = trigger
     setLightbox({ photos, index })
-  }
-
-  const closeLightbox = () => {
-    setLightbox(null)
-    lastTriggerRef.current?.focus()
   }
 
   return (
@@ -338,8 +368,8 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
         </header>
 
         <div className="comp-list">
-          {competitions.map((comp) => (
-            <article key={comp.id} className="comp-card">
+          {competitions.map((comp, compIdx) => (
+            <article key={comp.id} id={comp.id} className="comp-card">
               <div className="comp-head">
                 <div>
                   <h2 className="display h-md">{comp.title}</h2>
@@ -362,14 +392,6 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
                     <b>{item.value}</b>
                     <span>{item.label}</span>
                   </div>
-                ))}
-              </div>
-
-              <div className="tag-row" style={{ marginBottom: '24px' }}>
-                {comp.tags.map((tag) => (
-                  <span key={tag} className="tag">
-                    {tag}
-                  </span>
                 ))}
               </div>
 
@@ -396,7 +418,11 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
                     onClick={(e) => openPhoto(comp.photos, idx, e.currentTarget)}
                     aria-label={`View full photo: ${photo.caption}`}
                   >
-                    <img src={photo.src} alt={photo.alt} loading={idx === 0 ? 'eager' : 'lazy'} />
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading={compIdx === 0 && idx === 0 ? 'eager' : 'lazy'}
+                    />
                     <span className="comp-photo-caption">{photo.caption}</span>
                   </button>
                 ))}
@@ -416,9 +442,9 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
             if (e.target === e.currentTarget) closeLightbox()
           }}
         >
-          <div className="modal-dialog">
+          <div ref={dialogRef} className="modal-dialog">
             <div className="modal-head">
-              <p style={{ margin: 0, fontSize: '14px', color: 'var(--ink-secondary)' }}>
+              <p className="modal-caption">
                 {lightbox.photos[lightbox.index].caption} ({lightbox.index + 1}/{lightbox.photos.length})
               </p>
               <button
@@ -432,7 +458,7 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
               </button>
             </div>
 
-            <div className="modal-media">
+            <div className="modal-media modal-media-stage">
               <img
                 src={lightbox.photos[lightbox.index].src}
                 alt={lightbox.photos[lightbox.index].alt}
@@ -440,7 +466,7 @@ export default function AchievementsPage({ onBackHome }: AchievementsPageProps) 
             </div>
 
             {lightbox.photos.length > 1 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+              <div className="modal-nav-spread">
                 <button
                   type="button"
                   className="btn-secondary"
